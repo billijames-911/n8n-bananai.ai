@@ -1,0 +1,2439 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "from": "+16812026276",
+        "to": "+18777804236",
+        "message": "=your info come through!\n\nLove your IG aesthetic — so clean and on-brand.\n\nWith the cost of living rising, a lot of founders are finding it harder to get consistent leads. Is that something you’re experiencing too?\n\nIf so, I can show you how PreSold is helping service-based businesses fill their calendar — without relying on cold outreach or high ad spend.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        2864,
+        1232
+      ],
+      "id": "0d11778a-7798-408b-adb7-7d7ea945b569",
+      "name": "Send an SMS/MMS/WhatsApp message1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "contactId": "={{ $json.id }}",
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        1984,
+        1232
+      ],
+      "id": "31408299-dd51-4e91-802c-78ead59d7664",
+      "name": "Get a contact4",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "contactId": "={{ $json.id }}",
+        "updateFields": {
+          "tags": "={{ $json.tags.concat([ $('Format Paid Lead Data').item.json.source ]) }}"
+        },
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        2208,
+        1232
+      ],
+      "id": "98f75f59-4fcc-4f5c-9b33-a09d93b4ba41",
+      "name": "Add tag of source",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "191W_RrLTYDOM8bgXodL5hpyiusJ7vlTHPOVYFKzEOOk",
+          "mode": "list",
+          "cachedResultName": "Data Base of lead",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/191W_RrLTYDOM8bgXodL5hpyiusJ7vlTHPOVYFKzEOOk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/191W_RrLTYDOM8bgXodL5hpyiusJ7vlTHPOVYFKzEOOk/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Email": "={{ $json.email }}",
+            "Phone": "={{ $json.phone }}",
+            "Source": "={{ $json.source }}",
+            "Clinic Name": "={{ $('Format Paid Lead Data').item.json.body.clinic_name }}",
+            "First Name": "={{ $('Format Paid Lead Data').item.json.body.first_name }}",
+            "Last Name": "={{ $('Format Paid Lead Data').item.json.body.last_name }}",
+            "Time spam": "={{ $('Format Paid Lead Data').item.json.body.timestamp }}",
+            "Contact ID": "={{ $json.id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Contact ID",
+              "displayName": "Contact ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Clinic Name",
+              "displayName": "Clinic Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "First Name",
+              "displayName": "First Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Last Name",
+              "displayName": "Last Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Time spam",
+              "displayName": "Time spam",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Source",
+              "displayName": "Source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Follow up day",
+              "displayName": "Follow up day",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "85e485a7-b1ea-4b21-a3f4-4e57a2bd5666",
+      "name": "Save to Paid Leads Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [
+        2400,
+        1232
+      ],
+      "disabled": true,
+      "notes": "Stores paid leads separately for better tracking and ROI analysis"
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "redirect_url",
+              "value": "=https://preview--ejaz-clinic-connect.lovable.app/vsl?contact_id={{ $('Create contact').item.json.id }}"
+            },
+            {
+              "name": "status",
+              "value": "success"
+            },
+            {
+              "name": "message",
+              "value": "Redirecting to free training video..."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "47d5854e-1390-4965-8227-90ba4fa812a6",
+      "name": "Create VSL Redirect",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        2624,
+        1232
+      ],
+      "disabled": true,
+      "notes": "Creates redirect to VSL with paid lead contact ID for tracking"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://billu2323.app.n8n.cloud/webhook/vsl-tracking",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "contact_id",
+              "value": "={{ $('Create contact').item.json.id }}"
+            },
+            {
+              "name": "firstName",
+              "value": "={{ $('Format Paid Lead Data').item.json.body.first_name }}"
+            },
+            {
+              "name": "source",
+              "value": "={{ $('Create contact').item.json.tags[1] }}"
+            },
+            {
+              "name": "url",
+              "value": "={{ $('Create VSL Redirect').item.json.redirect_url }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d864e9ba-eed4-4a01-90e7-1dc924e6072e",
+      "name": "Trigger VSL Tracking",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        3088,
+        1232
+      ],
+      "disabled": true,
+      "notes": "Triggers same VSL workflow but with paid source for conversion tracking"
+    },
+    {
+      "parameters": {
+        "content": "## Workflow A.1(a): Welcome Organic & Paid Leads\n\n- Processes organic leads from webhook  \n- Formats data and adds to GoHighLevel CRM  \n- Stores in Google Sheets for tracking  \n- Sends personalized welcome SMS from **\"Aleyna\"**  \n- Redirects to VSL training video  \n- Triggers VSL tracking workflow\n",
+        "height": 1280,
+        "width": 4944,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -448,
+        128
+      ],
+      "typeVersion": 1,
+      "id": "c41fa4a6-7282-48b5-a1a7-fac8b1042b8e",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "email": "={{ $('Format Lead Data').item.json.email }}",
+        "phone": "={{ $('Format Lead Data').item.json.phone }}",
+        "additionalFields": {
+          "firstName": "={{ $('Format Lead Data').item.json.firstName }}"
+        },
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        1776,
+        1232
+      ],
+      "id": "05ba81c9-1c8e-4ace-ae29-aa5f42a9f392",
+      "name": "Create contact",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"redirect_url\": \"{{ $('Create VSL Redirect').item.json.redirect_url }}\"\n}",
+        "options": {}
+      },
+      "id": "1756a2e7-8a22-43e2-ba14-ec6a56b2de4c",
+      "name": "Send Response2",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        3264,
+        1248
+      ],
+      "disabled": true,
+      "notes": "Returns redirect response for paid leads to VSL page"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "lead",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "ac58ddda-d985-44b5-9052-1193522fca18",
+      "name": "Lead Webhook2",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        -320,
+        464
+      ],
+      "webhookId": "e4116475-f9f4-46c6-88c3-a16adf9c278c",
+      "notes": "Receives paid leads with expected data: name, email, clinic_name, phone, source='paid'"
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "contactExists",
+              "value": "={{ !!($('Find Contact by Email for valid-lead').item.json.id) }}"
+            },
+            {
+              "name": "contactId",
+              "value": "={{ $('Find Contact by Email for valid-lead').item.json.id ? $('Find Contact by Email for valid-lead').item.json.id : null }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        1280,
+        1216
+      ],
+      "id": "507362cf-06a3-4db1-9a1f-8f4ff39aafb9",
+      "name": "Set Contact Found Status1",
+      "disabled": true,
+      "notes": "Creates a variable to track if a contact was found"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $('Set Contact Found Status1').item.json.contactExists }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1472,
+        1216
+      ],
+      "id": "869d2b6a-f9a1-450f-86e4-fabf78cb15bf",
+      "name": "Check if Contact Exists1",
+      "disabled": true,
+      "notes": "Routes the workflow based on if a contact was found"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "contactId": "={{ $json.id }}",
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        1776,
+        1040
+      ],
+      "id": "2ee3a448-6112-4f68-a106-be3a41cfecca",
+      "name": "Get a contact",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "contactId": "={{ $json.id }}",
+        "updateFields": {
+          "tags": "={{ $json.tags }}"
+        },
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        1968,
+        1040
+      ],
+      "id": "d3cdcd72-2918-41d5-84db-8abd722cf313",
+      "name": "Add tag of source1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "Did you get a chance to book your strategy session?",
+        "emailType": "text",
+        "message": "=Hi {{ $json.firstName }}\n\nIt looks like you're finding our content useful, as we've seen your information come through again! We're glad to see you're interested in taking the next step.\n\nI'm not sure if you had a chance to book your strategy session last time, but in case you missed it, here's a direct link to my calendar:\n\n[Link to Booking Page: https://api.leadconnectorhq.com/widget/booking/W8QcIllkRPKyS76yvPEZ]\n\nThis is a great opportunity to discuss your clinic's specific needs and see if we're a good fit to help you grow.\n\nIf you're all set, you can ignore this email. Otherwise, I look forward to speaking with you!\n\nBest,\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        2176,
+        1040
+      ],
+      "id": "6b1e58f9-5cb4-4d91-b69e-132012f2f382",
+      "name": "Send a message",
+      "webhookId": "7eaaa8d7-5a33-4a67-a836-3f5795fdd6af",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "from": "+16812026276",
+        "to": "+18777804236",
+        "message": "=Hi {{ $('Get a contact').item.json.firstName }}, this is Alyena from Banana AI.\nNot sure if you had the chance to book your strategy session yet. Here’s the link to my calendar: https://api.leadconnectorhq.com/widget/booking/W8QcIllkRPKyS76yvPEZ .\n\nLooking forward to helping your clinic grow 🚀",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        2400,
+        1040
+      ],
+      "id": "8065e099-188b-4a59-b391-e9bea67102a9",
+      "name": "Send an SMS/MMS/WhatsApp message5",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "url": "=https://lookups.twilio.com/v2/PhoneNumbers/{{ $json.body.phone }}?Fields=line_type_intelligence",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "twilioApi",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        192,
+        624
+      ],
+      "id": "7c58b165-7737-45fe-ae40-80abdfb98b98",
+      "name": "Phone number test",
+      "disabled": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        416,
+        496
+      ],
+      "id": "8e930dd8-1927-40c9-9b8d-9e11c4fa2a7b",
+      "name": "Merge1",
+      "disabled": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const emailValidation = $json.result?.validation_details || {};\nconst emailStatus = ($json.result?.status || \"\").toLowerCase();\n\n// Email validation: must pass format, MX, and SMTP check, and status must be deliverable\nconst emailValid = emailValidation.format_valid === true &&\n                   emailValidation.mx_found === true &&\n                   emailValidation.smtp_check === true &&\n                   emailStatus === \"deliverable\";\n\n// Risky email flags\nconst emailRisky = emailValidation.catch_all === true ||\n                   emailValidation.disposable === true ||\n                   emailValidation.free === true ||\n                   emailValidation.role === true;\n\n// Phone validation: must be valid and either mobile or fixed_line\nconst phoneValid = $json.valid === true &&\n                   $json.line_type_intelligence &&\n                   [\"mobile\", \"fixed_line\"].includes($json.line_type_intelligence.type);\n\n// Determine status\nlet status = \"\";\nif (emailValid && phoneValid) {\n  status = \"valid\";\n} else if (!emailValid && phoneValid) {\n  status = \"invalid-email\";\n} else if (emailValid && !phoneValid) {\n  status = \"invalid-phone\";\n} else if (!emailValid && !phoneValid) {\n  status = \"invalid-contact\";\n}\n\n// Return structured result\nreturn [\n  {\n    phone_number: $json.phone_number || null,\n    email: $json.result?.email_address || null,\n    phoneValid,\n    emailValid,\n    emailRisky,\n    validationStatus: status\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        608,
+        496
+      ],
+      "id": "a29c84b3-201f-43cf-9f48-bec825bedf82",
+      "name": "Code",
+      "disabled": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "=https://api.zeruh.com/v1/verify?api_key=08912c6c8a5e45e4f2891c67fb8272a710c00346e07c80b820b9c034436d620d&email_address={{ $json.body.email }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        192,
+        336
+      ],
+      "id": "ddc941e6-5ba2-4840-b0a8-4a2ae89e06be",
+      "name": "Email check",
+      "retryOnFail": false,
+      "disabled": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2f4b6e36-5484-439c-8f2e-b66c05deb817",
+                    "leftValue": "={{$json.validationStatus}}",
+                    "rightValue": "invalid-contact",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "invalid-contact"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "eab688a0-2f8f-46cb-ab27-7432a1d2f4eb",
+                    "leftValue": "={{$json.validationStatus }}",
+                    "rightValue": "=invalid-email",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "invalid-email"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "910774eb-3f9f-4498-b2fc-9e4a619253a3",
+                    "leftValue": "={{$json.validationStatus}}",
+                    "rightValue": "=invalid-phone",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "invalid-phone"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "a8b50b44-2a68-4dd1-b96c-83629b182b1a",
+                    "leftValue": "={{$json.validationStatus}}",
+                    "rightValue": "valid",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "valid"
+            }
+          ]
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        864,
+        336
+      ],
+      "id": "5f7d7a9e-8f7e-49fb-85d1-c4cdd4d064e2",
+      "name": "Switch",
+      "disabled": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "from": "+16812026276",
+        "to": "+18777804236",
+        "message": "=This is Aleyna from OASIS {{ $('Format Lead Data').item.json.firstName }}, was just on my phone and saw your info come through! Love your IG aesthetic! Btw, I know the cost of living is effecting alot of clinics, are you also having trouble finding new clients?",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        2640,
+        832
+      ],
+      "id": "bfcf2584-8b10-4fde-b464-3ae352087916",
+      "name": "Send an SMS/MMS/WhatsApp message6",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "contactId": "={{ $json.id }}",
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        2032,
+        832
+      ],
+      "id": "3e3b0799-cb66-48be-b732-416d5a8528b7",
+      "name": "Get a contact6",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "contactId": "={{ $json.id }}",
+        "updateFields": {
+          "tags": "={{ $json.tags.concat([ $('Format Lead Data').item.json.source ]) }}"
+        },
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        2256,
+        832
+      ],
+      "id": "628a3875-cd6b-46a1-96b2-5a9a64189790",
+      "name": "Add tag of source2",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "redirect_url",
+              "value": "=https://preview--ejaz-clinic-connect.lovable.app/vsl?contact_id={{ $('Create contact1').item.json.id }}"
+            },
+            {
+              "name": "status",
+              "value": "success"
+            },
+            {
+              "name": "message",
+              "value": "Redirecting to free training video..."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "ba6127f0-c1ca-4ffc-91ac-56614bb00dfa",
+      "name": "Create VSL Redirect1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        2448,
+        832
+      ],
+      "disabled": true,
+      "notes": "Creates redirect to VSL with paid lead contact ID for tracking"
+    },
+    {
+      "parameters": {
+        "email": "={{ $('Format Lead Data').item.json.email }}",
+        "phone": "={{ $('Format Lead Data').item.json.phone }}",
+        "additionalFields": {
+          "firstName": "={{ $('Format Lead Data').item.json.firstName }}"
+        },
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        1824,
+        832
+      ],
+      "id": "946f804e-8c09-4a4e-918d-7ae084b11e48",
+      "name": "Create contact1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"redirect_url\": \"{{ $('Create VSL Redirect1').item.json.redirect_url }}\"\n}",
+        "options": {}
+      },
+      "id": "eb199430-8f60-4122-9290-c9e66604a86c",
+      "name": "Send Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        2880,
+        832
+      ],
+      "disabled": true,
+      "notes": "Returns redirect response for paid leads to VSL page"
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "contactExists",
+              "value": "={{ !!($('Find Contact by Email for phone-number-invalid').item.json.id) }}"
+            },
+            {
+              "name": "contactId",
+              "value": "={{ $('Find Contact by Email for phone-number-invalid').item.json.id ? $('Find Contact by Email for phone-number-invalid').item.json.id : null }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        1328,
+        816
+      ],
+      "id": "f2a151c7-831e-4ce0-973e-521bcca7f61e",
+      "name": "Set Contact Found Status",
+      "disabled": true,
+      "notes": "Creates a variable to track if a contact was found"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $('Set Contact Found Status').item.json.contactExists }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1520,
+        816
+      ],
+      "id": "2070b7e2-4719-4ad0-8994-b8822b697006",
+      "name": "Check if Contact Exists",
+      "disabled": true,
+      "notes": "Routes the workflow based on if a contact was found"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "contactId": "={{ $json.id }}",
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        1824,
+        640
+      ],
+      "id": "43f248cf-a03d-41b4-8b52-6dc766ac16a8",
+      "name": "Get a contact1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "contactId": "={{ $json.id }}",
+        "updateFields": {
+          "tags": "={{ $json.tags.concat(['booked-again']) }}"
+        },
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        2016,
+        640
+      ],
+      "id": "285c4349-c020-4a5d-9690-72fe8905d97e",
+      "name": "Add tag of source3",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "Did you get a chance to book your strategy session?",
+        "emailType": "text",
+        "message": "=Hi {{ $json.firstName }},\n\nIt looks like you're finding our content useful, as we've seen your information come through again! We're glad to see you're interested in taking the next step.\n\nI'm not sure if you had a chance to book your strategy session last time, but in case you missed it, here's a direct link to my calendar:\n\n[Link to Booking Page: https://api.leadconnectorhq.com/widget/booking/W8QcIllkRPKyS76yvPEZ]\n\nThis is a great opportunity to discuss your clinic's specific needs and see if we're a good fit to help you grow.\n\nIf you're all set, you can ignore this email. Otherwise, I look forward to speaking with you!\n\nBest,\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        2224,
+        640
+      ],
+      "id": "0fa88f34-116f-4817-bf96-ada50051a563",
+      "name": "Send a message2",
+      "webhookId": "7eaaa8d7-5a33-4a67-a836-3f5795fdd6af",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "contactId": "={{ $json.id }}",
+        "updateFields": {
+          "tags": "={{ $json.tags.concat(['not-booked']) }}"
+        },
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        3936,
+        848
+      ],
+      "id": "0b1f42b8-b3b8-449b-bc6a-5849156e8365",
+      "name": "Update a contact",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "contactId": "={{ $json.id }}",
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        3760,
+        848
+      ],
+      "id": "67f6b733-2771-4260-b39d-ba35144ee9c7",
+      "name": "Get a contact12",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "unit": "seconds"
+      },
+      "id": "2deb2f4c-19a3-4228-83c3-1cc99431ccc1",
+      "name": "Wait 3 Minutes1",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [
+        3104,
+        832
+      ],
+      "webhookId": "06fa69b4-3837-4535-9e9e-f3962e93109d",
+      "disabled": true,
+      "notes": "Waits 3 minutes from initial VSL tracking to check if booking occurred"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.tags }}",
+              "operation": "contains",
+              "value2": "booking-form-submitted"
+            }
+          ]
+        }
+      },
+      "id": "5024b8f7-b22c-4b3f-b44d-d26613fc4100",
+      "name": "Check Booking Status1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        3552,
+        832
+      ],
+      "disabled": true,
+      "notes": "Checks if booking-form-submitted tag exists - if yes, end workflow"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "contactId": "={{ $('Get a contact6').item.json.id }}",
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        3328,
+        832
+      ],
+      "id": "b7f709d3-9106-482a-a1f4-63307bab1c8d",
+      "name": "Get a contact13",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "from": "+16812026276",
+        "to": "+18777804236",
+        "message": "=This is Aleyna from OASIS {{ $('Format Lead Data').item.json.firstName }}, was just on my phone and saw your info come through! Love your IG aesthetic! Btw, I know the cost of living is effecting alot of clinics, are you also having trouble finding new clients?",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        2640,
+        480
+      ],
+      "id": "4daa60df-57e4-4100-a4ff-1fd8dc4bd5e2",
+      "name": "Send an SMS/MMS/WhatsApp message7",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "contactId": "={{ $json.id }}",
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        2032,
+        480
+      ],
+      "id": "62ff672e-5f73-4897-b724-da89733128de",
+      "name": "Get a contact14",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "contactId": "={{ $json.id }}",
+        "updateFields": {
+          "tags": "={{ $json.tags.concat([ $('Format Lead Data').item.json.source ]) }}"
+        },
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        2256,
+        480
+      ],
+      "id": "3084541e-74d1-409e-b1f3-befa9688f90e",
+      "name": "Add tag of source4",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "redirect_url",
+              "value": "=https://preview--ejaz-clinic-connect.lovable.app/vsl?contact_id={{ $('Create contact2').item.json.id }}"
+            },
+            {
+              "name": "status",
+              "value": "success"
+            },
+            {
+              "name": "message",
+              "value": "Redirecting to free training video..."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "e691baab-ee6f-46b7-93e4-79e44db00adc",
+      "name": "Create VSL Redirect2",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        2448,
+        480
+      ],
+      "disabled": true,
+      "notes": "Creates redirect to VSL with paid lead contact ID for tracking"
+    },
+    {
+      "parameters": {
+        "email": "={{ $('Format Lead Data').item.json.email }}",
+        "phone": "={{ $('Format Lead Data').item.json.phone }}",
+        "additionalFields": {
+          "firstName": "={{ $('Format Lead Data').item.json.firstName }}"
+        },
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        1824,
+        480
+      ],
+      "id": "0618d06b-ac3b-4361-829e-b4c48dfd376b",
+      "name": "Create contact2",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"redirect_url\": \"{{ $('Create VSL Redirect2').item.json.redirect_url }}\"\n}",
+        "options": {}
+      },
+      "id": "282f2464-e760-4c34-8f01-baa9fb661cb7",
+      "name": "Send Response1",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        2880,
+        480
+      ],
+      "disabled": true,
+      "notes": "Returns redirect response for paid leads to VSL page"
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "contactExists",
+              "value": "={{ !!($('Find Contact by Email for invalid-email').item.json.id) }}"
+            },
+            {
+              "name": "contactId",
+              "value": "={{ $('Find Contact by Email for invalid-email').item.json.id ? $('Find Contact by Email for invalid-email').item.json.id : null }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        1328,
+        464
+      ],
+      "id": "252b8a09-444e-402a-87c9-e471df7bf784",
+      "name": "Set Contact Found Status2",
+      "disabled": true,
+      "notes": "Creates a variable to track if a contact was found"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $('Set Contact Found Status2').item.json.contactExists }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1520,
+        464
+      ],
+      "id": "874deefa-4e44-4a6e-8621-aefc3e2be0ca",
+      "name": "Check if Contact Exists2",
+      "disabled": true,
+      "notes": "Routes the workflow based on if a contact was found"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "contactId": "={{ $json.id }}",
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        1824,
+        288
+      ],
+      "id": "e9fbd8f9-8a47-4020-aab3-36937b2b24cd",
+      "name": "Get a contact2",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "contactId": "={{ $json.id }}",
+        "updateFields": {
+          "tags": "={{ $json.tags.concat(['booked-again']) }}"
+        },
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        2016,
+        288
+      ],
+      "id": "16b00e41-b26f-43b3-9002-f28189709791",
+      "name": "Add tag of source5",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "contactId": "={{ $json.id }}",
+        "updateFields": {
+          "tags": "={{ $json.tags.concat(['not-booked']) }}"
+        },
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        3936,
+        496
+      ],
+      "id": "e45c1f98-ab57-4ff4-b603-11523d17e47d",
+      "name": "Update a contact1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "contactId": "={{ $json.id }}",
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        3760,
+        496
+      ],
+      "id": "8868338a-b1dc-401b-a043-b012e5a1d845",
+      "name": "Get a contact15",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "unit": "seconds"
+      },
+      "id": "fcbe658e-9e70-471a-ab37-bcb3e9ab401d",
+      "name": "Wait 3 Minutes2",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [
+        3104,
+        480
+      ],
+      "webhookId": "06fa69b4-3837-4535-9e9e-f3962e93109d",
+      "disabled": true,
+      "notes": "Waits 3 minutes from initial VSL tracking to check if booking occurred"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.tags }}",
+              "operation": "contains",
+              "value2": "booking-form-submitted"
+            }
+          ]
+        }
+      },
+      "id": "5966402a-1bad-4529-af84-f8db0fea44e3",
+      "name": "Check Booking Status2",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        3552,
+        480
+      ],
+      "disabled": true,
+      "notes": "Checks if booking-form-submitted tag exists - if yes, end workflow"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "contactId": "={{ $('Get a contact14').item.json.id }}",
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        3328,
+        480
+      ],
+      "id": "7b71a905-44d2-4c3e-9a0b-927b505a11e7",
+      "name": "Get a contact16",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "from": "+16812026276",
+        "to": "+18777804236",
+        "message": "=Hi {{ $('Get a contact').item.json.firstName }}, this is Alyena from Banana AI.\nNot sure if you had the chance to book your strategy session yet. Here’s the link to my calendar: https://api.leadconnectorhq.com/widget/booking/W8QcIllkRPKyS76yvPEZ .\n\nLooking forward to helping your clinic grow 🚀",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        2240,
+        288
+      ],
+      "id": "48c86564-54c4-4a0a-ba55-2d376ea07b5b",
+      "name": "Send an SMS/MMS/WhatsApp message8",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://billu2323.app.n8n.cloud/webhook/start-elevenlab.io-sequence",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "contact_id",
+              "value": "={{ $json.id }}"
+            },
+            {
+              "name": "firstName",
+              "value": "={{ $json.firstName }}"
+            },
+            {
+              "name": "source",
+              "value": "={{ $json.tags[1] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "9f864d7e-56ae-48c3-ad45-5d47cb47ceea",
+      "name": "Trigger ElevenLab Sequence",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        4160,
+        512
+      ],
+      "disabled": true,
+      "notes": "Starts Workflow A.3 (14-day ElevenLab follow-up) for non-booked leads"
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "firstName",
+              "value": "={{ $json.body.first_name }}"
+            },
+            {
+              "name": "lastName",
+              "value": "={{ $json.body.last_name }}"
+            },
+            {
+              "name": "email",
+              "value": "={{ $json.body.email }}"
+            },
+            {
+              "name": "phone",
+              "value": "={{ $json.body.phone }}"
+            },
+            {
+              "name": "clinicName",
+              "value": "={{ $json.body['Business Name'] }}"
+            },
+            {
+              "name": "source",
+              "value": "={{ $json.body.utm_source }}"
+            },
+            {
+              "name": "timestamp",
+              "value": "={{ new Date().toISOString() }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "12688d08-1d8c-4000-8ebe-7f0efb94e8d5",
+      "name": "Format Lead Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        -96,
+        448
+      ],
+      "notes": "Formats paid lead data with 'paid-lead' tags instead of organic"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "returnAll": true,
+        "filters": {
+          "query": "={{ $json.email }}"
+        },
+        "options": {},
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        1024,
+        1216
+      ],
+      "id": "8a176326-bd3a-432b-b9fd-4e2367123fd5",
+      "name": "Find Contact by Email for valid-lead",
+      "alwaysOutputData": true,
+      "disabled": true,
+      "notes": "Searches for an existing contact using the email"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "returnAll": true,
+        "filters": {
+          "query": "={{ $json.email }}"
+        },
+        "options": {},
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        1072,
+        816
+      ],
+      "id": "ceeea9f2-845d-4f1a-bb1b-33b599a19019",
+      "name": "Find Contact by Email for phone-number-invalid",
+      "alwaysOutputData": true,
+      "disabled": true,
+      "notes": "Searches for an existing contact using the email"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "returnAll": true,
+        "filters": {
+          "query": "={{ $json.email }}"
+        },
+        "options": {},
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        1072,
+        464
+      ],
+      "id": "378177e9-d10b-4b0c-9120-9abff2d37ed1",
+      "name": "Find Contact by Email for invalid-email",
+      "alwaysOutputData": true,
+      "disabled": true,
+      "notes": "Searches for an existing contact using the email"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://billu2323.app.n8n.cloud/webhook/vsl-tracking",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "contact_id",
+              "value": "={{ $('Create contact').item.json.id }}"
+            },
+            {
+              "name": "firstName",
+              "value": "={{ $('Format Paid Lead Data').item.json.body.first_name }}"
+            },
+            {
+              "name": "source",
+              "value": "={{ $('Create contact').item.json.tags[1] }}"
+            },
+            {
+              "name": "url",
+              "value": "={{ $('Create VSL Redirect').item.json.redirect_url }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "abbcf483-8479-4ab0-b5f1-8011b64fbaa5",
+      "name": "Trigger VSL Tracking1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        0,
+        0
+      ],
+      "notes": "Triggers same VSL workflow but with paid source for conversion tracking"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://yellowrockhouse.app.n8n.cloud/webhook-test/start-email-nurture",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "contact_id",
+              "value": "={{ $('Get a contact5').item.json.id }}"
+            },
+            {
+              "name": "firstName",
+              "value": "={{ $('Get a contact5').item.json.firstName }}"
+            },
+            {
+              "name": "email",
+              "value": "={{ $('Get a contact5').item.json.email }}"
+            },
+            {
+              "name": "vsl video link",
+              "value": "={{ $('VSL Tracking Webhook1').item.json.body.url }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "14e2517e-9a79-4f0d-816e-dcbe11108afd",
+      "name": "Trigger Email Nurture For not booked",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        4144,
+        848
+      ],
+      "disabled": true,
+      "notes": "Starts Workflow A.2 (14-day email nurture) for non-booked leads"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "lead-in",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "0e59645f-4bb9-42f4-a6a6-7a3d61fb7c02",
+      "name": "Lead Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        64,
+        2416
+      ],
+      "webhookId": "e4116475-f9f4-46c6-88c3-a16adf9c278c",
+      "notes": "Receives paid leads with expected data: name, email, clinic_name, phone, source='paid'"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "contactId": "={{ $json.id }}",
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        368,
+        2016
+      ],
+      "id": "bf0591cd-addd-4002-bad1-47fe76dce73e",
+      "name": "Get a contact5",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "contactId": "={{ $json.id }}",
+        "updateFields": {
+          "tags": "={{ $json.tags.concat([ $('Format Paid Lead Data').item.json.source ]) }}"
+        },
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        592,
+        2016
+      ],
+      "id": "8891855c-5aab-4516-aa29-8205a6443a01",
+      "name": "Add tag of source6",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "redirect_url",
+              "value": "=https://preview--ejaz-clinic-connect.lovable.app/vsl?contact_id={{ $('Create contact3').item.json.id }}"
+            },
+            {
+              "name": "status",
+              "value": "success"
+            },
+            {
+              "name": "message",
+              "value": "Redirecting to free training video..."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7edf17d7-da16-462a-bbc0-cb0b84287e52",
+      "name": "Create VSL Redirect3",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        864,
+        2016
+      ],
+      "disabled": true,
+      "notes": "Creates redirect to VSL with paid lead contact ID for tracking"
+    },
+    {
+      "parameters": {
+        "email": "={{ $('Format Lead Data').item.json.email }}",
+        "phone": "={{ $('Format Lead Data').item.json.phone }}",
+        "additionalFields": {
+          "firstName": "={{ $('Format Lead Data').item.json.firstName }}"
+        },
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        160,
+        2016
+      ],
+      "id": "c535d377-af22-48bf-8de8-a2ea1771a753",
+      "name": "Create contact3",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"redirect_url\": \"https://funnel.hastylead.com/home-page-page\"\n}",
+        "options": {}
+      },
+      "id": "a2ed29f9-7bf0-4a8e-afd6-fb96812331fe",
+      "name": "Send Response3",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        432,
+        2384
+      ],
+      "notes": "Returns redirect response for paid leads to VSL page"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "You are helpful ai",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        1904,
+        1712
+      ],
+      "id": "402a2b1e-68f4-495a-8ad1-a463f9b123b6",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.0-pro-exp",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1904,
+        1856
+      ],
+      "id": "73031ab8-2624-4c92-b173-80b0788fa936",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "eDoxNg3xgHDzYThN",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Send an SMS/MMS/WhatsApp message1": {
+      "main": [
+        [
+          {
+            "node": "Trigger VSL Tracking",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a contact4": {
+      "main": [
+        [
+          {
+            "node": "Add tag of source",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add tag of source": {
+      "main": [
+        [
+          {
+            "node": "Save to Paid Leads Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save to Paid Leads Sheet": {
+      "main": [
+        [
+          {
+            "node": "Create VSL Redirect",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create VSL Redirect": {
+      "main": [
+        [
+          {
+            "node": "Send an SMS/MMS/WhatsApp message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trigger VSL Tracking": {
+      "main": [
+        [
+          {
+            "node": "Send Response2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create contact": {
+      "main": [
+        [
+          {
+            "node": "Get a contact4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lead Webhook2": {
+      "main": [
+        [
+          {
+            "node": "Format Lead Data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Trigger VSL Tracking1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Contact Found Status1": {
+      "main": [
+        [
+          {
+            "node": "Check if Contact Exists1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if Contact Exists1": {
+      "main": [
+        [
+          {
+            "node": "Get a contact",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create contact",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a contact": {
+      "main": [
+        [
+          {
+            "node": "Add tag of source1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add tag of source1": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        [
+          {
+            "node": "Send an SMS/MMS/WhatsApp message5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Phone number test": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email check": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Find Contact by Email for invalid-email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Find Contact by Email for phone-number-invalid",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Find Contact by Email for valid-lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send an SMS/MMS/WhatsApp message6": {
+      "main": [
+        [
+          {
+            "node": "Send Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a contact6": {
+      "main": [
+        [
+          {
+            "node": "Add tag of source2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add tag of source2": {
+      "main": [
+        [
+          {
+            "node": "Create VSL Redirect1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create VSL Redirect1": {
+      "main": [
+        [
+          {
+            "node": "Send an SMS/MMS/WhatsApp message6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create contact1": {
+      "main": [
+        [
+          {
+            "node": "Get a contact6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Response": {
+      "main": [
+        [
+          {
+            "node": "Wait 3 Minutes1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Contact Found Status": {
+      "main": [
+        [
+          {
+            "node": "Check if Contact Exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if Contact Exists": {
+      "main": [
+        [
+          {
+            "node": "Get a contact1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create contact1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a contact1": {
+      "main": [
+        [
+          {
+            "node": "Add tag of source3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add tag of source3": {
+      "main": [
+        [
+          {
+            "node": "Send a message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a contact": {
+      "main": [
+        [
+          {
+            "node": "Trigger Email Nurture For not booked",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a contact12": {
+      "main": [
+        [
+          {
+            "node": "Update a contact",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 3 Minutes1": {
+      "main": [
+        [
+          {
+            "node": "Get a contact13",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Booking Status1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Get a contact12",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a contact13": {
+      "main": [
+        [
+          {
+            "node": "Check Booking Status1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send an SMS/MMS/WhatsApp message7": {
+      "main": [
+        [
+          {
+            "node": "Send Response1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a contact14": {
+      "main": [
+        [
+          {
+            "node": "Add tag of source4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add tag of source4": {
+      "main": [
+        [
+          {
+            "node": "Create VSL Redirect2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create VSL Redirect2": {
+      "main": [
+        [
+          {
+            "node": "Send an SMS/MMS/WhatsApp message7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create contact2": {
+      "main": [
+        [
+          {
+            "node": "Get a contact14",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Response1": {
+      "main": [
+        [
+          {
+            "node": "Wait 3 Minutes2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Contact Found Status2": {
+      "main": [
+        [
+          {
+            "node": "Check if Contact Exists2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if Contact Exists2": {
+      "main": [
+        [
+          {
+            "node": "Get a contact2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create contact2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a contact2": {
+      "main": [
+        [
+          {
+            "node": "Add tag of source5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add tag of source5": {
+      "main": [
+        [
+          {
+            "node": "Send an SMS/MMS/WhatsApp message8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a contact1": {
+      "main": [
+        [
+          {
+            "node": "Trigger ElevenLab Sequence",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a contact15": {
+      "main": [
+        [
+          {
+            "node": "Update a contact1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 3 Minutes2": {
+      "main": [
+        [
+          {
+            "node": "Get a contact16",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Booking Status2": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Get a contact15",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a contact16": {
+      "main": [
+        [
+          {
+            "node": "Check Booking Status2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Lead Data": {
+      "main": [
+        [
+          {
+            "node": "Phone number test",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Email check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Contact by Email for valid-lead": {
+      "main": [
+        [
+          {
+            "node": "Set Contact Found Status1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Contact by Email for phone-number-invalid": {
+      "main": [
+        [
+          {
+            "node": "Set Contact Found Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Contact by Email for invalid-email": {
+      "main": [
+        [
+          {
+            "node": "Set Contact Found Status2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lead Webhook": {
+      "main": [
+        [
+          {
+            "node": "Send Response3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a contact5": {
+      "main": [
+        [
+          {
+            "node": "Add tag of source6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add tag of source6": {
+      "main": [
+        [
+          {
+            "node": "Create VSL Redirect3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create VSL Redirect3": {
+      "main": [
+        []
+      ]
+    },
+    "Create contact3": {
+      "main": [
+        [
+          {
+            "node": "Get a contact5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {
+    "Lead Webhook2": [
+      {
+        "headers": {
+          "host": "yellowrockhouse.app.n8n.cloud",
+          "user-agent": "axios/1.7.7",
+          "content-length": "2242",
+          "accept": "application/json, text/plain, */*",
+          "accept-encoding": "gzip, br",
+          "cdn-loop": "cloudflare; loops=1; subreqs=1",
+          "cf-connecting-ip": "34.61.244.108",
+          "cf-ew-via": "15",
+          "cf-ipcountry": "US",
+          "cf-ray": "979e215941aaeacf-ORD",
+          "cf-visitor": "{\"scheme\":\"https\"}",
+          "cf-worker": "n8n.cloud",
+          "content-type": "application/json",
+          "x-forwarded-for": "34.61.244.108, 172.70.126.65",
+          "x-forwarded-host": "yellowrockhouse.app.n8n.cloud",
+          "x-forwarded-port": "443",
+          "x-forwarded-proto": "https",
+          "x-forwarded-server": "traefik-prod-users-gwc-13-6db466c7ff-bxmfh",
+          "x-is-trusted": "yes",
+          "x-real-ip": "34.61.244.108"
+        },
+        "params": {},
+        "query": {},
+        "body": {
+          "utm_source": "Organic",
+          "utm_medium": "",
+          "Business Name": "VitalCare",
+          "Sales Rep": "",
+          "contact_id": "41zAmWMqvFwZ8VVaEfG9",
+          "first_name": "Muhammad",
+          "last_name": "Ejaz",
+          "full_name": "Muhammad Ejaz",
+          "email": "numanejazdeen@gmail.com",
+          "phone": "+966576908563",
+          "tags": "voicemail_day_0,voicemail_day_4,voicemail_day_0_1",
+          "country": "US",
+          "timezone": "Asia/Riyadh",
+          "date_created": "2025-09-04T11:04:49.074Z",
+          "contact_source": "opt-in form",
+          "full_address": "",
+          "contact_type": "lead",
+          "location": {
+            "name": "Yellow Rock House",
+            "address": "3400 Cottage Way, Ste G2 #21593",
+            "city": "Sacramento",
+            "state": "California",
+            "country": "US",
+            "postalCode": "95825",
+            "fullAddress": "3400 Cottage Way, Ste G2 #21593, Sacramento California 95825",
+            "id": "6YFcDHnhN2DTQoFcYZF3"
+          },
+          "workflow": {
+            "id": "1fc5cdb2-2686-476e-b6e3-903782d53305",
+            "name": "Form Submission"
+          },
+          "triggerData": {},
+          "contact": {
+            "attributionSource": {
+              "sessionSource": "CRM UI",
+              "medium": "manual",
+              "mediumId": null
+            },
+            "lastAttributionSource": {
+              "sessionSource": "Referral",
+              "url": "https://api.leadconnectorhq.com/widget/form/nkXUVFxeQ1sEGhvRRYPf",
+              "utmSource": null,
+              "utmMedium": null,
+              "utmContent": null,
+              "utmTerm": null,
+              "utmKeyword": null,
+              "utmMatchtype": null,
+              "referrer": "https://leadgen-apps-form-survey-builder.leadconnectorhq.com",
+              "gclid": null,
+              "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+              "ip": "2001:16a2:ca34:9900:cc43:e028:bd88:44e3",
+              "gaClientId": "GA1.1.248908190.1756932204",
+              "gaSessionId": null,
+              "medium": "form",
+              "mediumId": "nkXUVFxeQ1sEGhvRRYPf",
+              "adName": null,
+              "adGroupId": null,
+              "adId": null,
+              "gbraid": null,
+              "wbraid": null
+            }
+          },
+          "attributionSource": {
+            "sessionSource": "Direct traffic",
+            "url": "https://api.leadconnectorhq.com/widget/bookings/yrh-discovery-call",
+            "campaign": null,
+            "utmSource": null,
+            "utmMedium": null,
+            "utmContent": null,
+            "utmTerm": null,
+            "utmKeyword": null,
+            "utmMatchtype": null,
+            "referrer": null,
+            "gclid": null,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
+            "ip": "2001:16a2:ca34:9900:cc43:e028:bd88:44e3",
+            "gaClientId": "GA1.1.248908190.1756932204",
+            "gaSessionId": null,
+            "medium": "form",
+            "mediumId": "nkXUVFxeQ1sEGhvRRYPf",
+            "adName": null,
+            "adGroupId": null,
+            "adId": null,
+            "gbraid": null,
+            "wbraid": null
+          },
+          "customData": {}
+        },
+        "webhookUrl": "https://yellowrockhouse.app.n8n.cloud/webhook-test/lead",
+        "executionMode": "test"
+      }
+    ]
+  },
+  "meta": {
+    "instanceId": "1a6100b2e52ae3c290d86af3a0507cd2e67a0cc99a26544ed00345df21ae1dd0"
+  }
+}
