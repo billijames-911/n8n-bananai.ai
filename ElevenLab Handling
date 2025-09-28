@@ -1,0 +1,813 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "lead-found",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        64,
+        192
+      ],
+      "id": "10ec4bf4-82de-4d0e-974a-6a32c170213a",
+      "name": "Webhook",
+      "webhookId": "350efc07-25c6-4fcf-a6f3-b46dfbd3f082"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={ \n  \"type\": \"conversation_initiation_client_data\",   \n  \"dynamic_variables\": { \n    \"firstname\": \"{{ $json.first_name }}\", \n    \"sequence_day\": \"{{ $json.sequence_day }}\", \n    \"reminder\": \"{{ $json.reminder }}\", \n    \"last_transcript\": \"{{ $json.last_transcript }}\",\n    \"first_message\": \"{{ $json.message }}\"\n   } \n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        864,
+        176
+      ],
+      "id": "c6287d1b-69f1-4a52-a4af-4161cdddf77b",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "content": "Elevenlab Getting Data Base Lead Data",
+        "height": 336,
+        "width": 1056
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "1598f76e-d33d-41ee-b0e2-86b24dc45681",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "booking-confirm",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        64,
+        512
+      ],
+      "id": "0b6eb0a7-a8a6-428d-88b1-2811f796dadc",
+      "name": "Webhook1",
+      "webhookId": "350efc07-25c6-4fcf-a6f3-b46dfbd3f082"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"type\": \"conversation_initiation_client_data\",\n  \"dynamic_variables\": {\n    \"firstname\": \"{{ $json['First Name'] }}\",\n    \"booking_date\": \"{{ $json['Booking Date'] }}\",\n    \"booking_time\": \"{{ $json['Booking time'] }}\"\n  }\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        480,
+        512
+      ],
+      "id": "d702f2e3-80fe-49d3-b53d-a15a99deb4a9",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "content": "Elevenlab Inbound Webhook ",
+        "height": 272,
+        "width": 784,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        400
+      ],
+      "typeVersion": 1,
+      "id": "d7770b38-2acf-4739-9fb5-19f54e1eccde",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "191W_RrLTYDOM8bgXodL5hpyiusJ7vlTHPOVYFKzEOOk",
+          "mode": "list",
+          "cachedResultName": "Data Base of lead",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/191W_RrLTYDOM8bgXodL5hpyiusJ7vlTHPOVYFKzEOOk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 291180587,
+          "mode": "list",
+          "cachedResultName": "Booking DB",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/191W_RrLTYDOM8bgXodL5hpyiusJ7vlTHPOVYFKzEOOk/edit#gid=291180587"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Phone",
+              "lookupValue": "={{ $json.body.called_number }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        272,
+        512
+      ],
+      "id": "08f434d4-4571-4fc3-ae40-5f7d6931b6d3",
+      "name": "Booking DB",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $json; // your merged row\n\n// Make sure Follow up day exists\nif (!data[\"Follow up day\"]) {\n    throw new Error(\"Follow up day is missing for this lead\");\n}\n\n// Extract current day number, e.g., \"Day 2\" -> 2\nconst currentDayNumber = parseInt(data[\"Follow up day\"].replace(/\\D/g, \"\"), 10);\nconst firstName = data[\"First Name\"] ?? \"there\";\n\n// Function to get last available transcript & summary\nfunction getLastConversation(row, dayNumber) {\n    for (let i = dayNumber - 1; i >= 0; i--) {\n        const transcriptKey = `Transcript Day ${i}`;\n        const summaryKey = `Summary Day ${i}`;\n        if (row[transcriptKey] && row[transcriptKey].trim() !== \"\") {\n            return {\n                transcript: row[transcriptKey],\n                summary: row[summaryKey] || \"\"\n            };\n        }\n    }\n    return { transcript: \"\", summary: \"\" };\n}\n\n// Get last conversation\nconst lastConversation = getLastConversation(data, currentDayNumber);\n\n// Generate message based on day\nlet message = \"\";\nif (currentDayNumber === 0) {\n    message = `Hi ${firstName}, it’s Aleyna from Banana AI. You recently signed up for our free video training but haven’t booked your appointment yet. Was there something holding you back?`;\n} else if (currentDayNumber >= 1 && currentDayNumber <= 14) {\n    const contextText = lastConversation.transcript ? `Previously you said: \"${lastConversation.transcript}\" ` : \"\";\n    message = `Hi ${firstName}, it’s Aleyna again from Banana AI. I noticed you still haven’t booked your appointment. What’s stopping you?`;\n} else {\n    message = `Hi ${firstName}, it’s Aleyna again from Banana AI. I noticed you still haven’t booked the appointment yet. What’s stopping you?`;\n}\n\nreturn [\n    {\n        json: {\n            first_name: firstName,\n            sequence_day: data[\"Follow up day\"],\n            last_transcript: lastConversation.transcript,\n            last_summary: lastConversation.summary,\n            reminder: data.Reminder || \"\",\n            message\n        }\n    }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        688,
+        176
+      ],
+      "id": "237d3d56-0ce0-466d-b900-290d17266c3d",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "booking-confirm",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        64,
+        864
+      ],
+      "id": "57c1aa53-9356-4038-bc52-c376808d3b62",
+      "name": "Webhook2",
+      "webhookId": "350efc07-25c6-4fcf-a6f3-b46dfbd3f082"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"type\": \"conversation_initiation_client_data\",\n  \"dynamic_variables\": {\n    \"firstname\": \"{{ $json['First Name'] }}\",\n    \"booking_date\": \"{{ $json['Booking Date'] }}\",\n    \"booking_time\": \"{{ $json['Booking time'] }}\"\n  }\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        672,
+        864
+      ],
+      "id": "98687635-c579-4cd4-98b0-c025df202d39",
+      "name": "Respond to Webhook2"
+    },
+    {
+      "parameters": {
+        "content": "Elevenlab Transferring Outbound Transcript to Webhook ",
+        "height": 272,
+        "width": 864,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        768
+      ],
+      "typeVersion": 1,
+      "id": "037b940e-ccd7-4513-a7cd-b291cd6a95d4",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "191W_RrLTYDOM8bgXodL5hpyiusJ7vlTHPOVYFKzEOOk",
+          "mode": "list",
+          "cachedResultName": "Data Base of lead",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/191W_RrLTYDOM8bgXodL5hpyiusJ7vlTHPOVYFKzEOOk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1807673988,
+          "mode": "list",
+          "cachedResultName": "Outbound Calls",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/191W_RrLTYDOM8bgXodL5hpyiusJ7vlTHPOVYFKzEOOk/edit#gid=1807673988"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {
+            "To Number": "={{ $('Webhook2').item.json.body.data.conversation_initiation_client_data.dynamic_variables.system__called_number }}"
+          },
+          "matchingColumns": [
+            "To Number"
+          ],
+          "schema": [
+            {
+              "id": "Time Spam",
+              "displayName": "Time Spam",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Direction",
+              "displayName": "Direction",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "To Number",
+              "displayName": "To Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "From number",
+              "displayName": "From number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Transcript Day 0",
+              "displayName": "Transcript Day 0",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Summary Day 0",
+              "displayName": "Summary Day 0",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        464,
+        864
+      ],
+      "id": "bee3dcf8-753b-45a4-b362-f5d2a1afcbd4",
+      "name": "Append or update row in sheet"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $json.body.data;\nconst seqDay = body.conversation_initiation_client_data.dynamic_variables.sequence_day;\n\n// Extract day number from \"Day 0\"\nconst dayNumber = seqDay.replace(/\\D/g, \"\");\n\n// Exact column names in your sheet\nconst transcriptColumn = `Transcript Day ${dayNumber}`;\nconst summaryColumn = `Summary Day ${dayNumber}`;\n\n// Build transcript text\nlet transcriptText = body.transcript\n  .map(t => `${t.role.toUpperCase()}: ${t.message}`)\n  .join(\" \");\n\n// Trim phone numbers to avoid mismatches\nconst toNumber = body.metadata.phone_call.external_number.trim();\nconst fromNumber = body.metadata.phone_call.agent_number.trim();\n\nreturn [\n  {\n    json: {\n      \"To Number\": toNumber,                    // matches sheet\n      \"Time Spam\": new Date(body.metadata.start_time_unix_secs * 1000).toLocaleString(\"en-GB\"),\n      \"Direction\": body.metadata.phone_call.direction,  // matches sheet\n      \"From number\": fromNumber,                // matches sheet\n      [transcriptColumn]: transcriptText,      // dynamic day column\n      [summaryColumn]: body.analysis.call_summary_title // dynamic day column\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        272,
+        864
+      ],
+      "id": "d273607b-866a-4381-967f-d1c783160a7a",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "191W_RrLTYDOM8bgXodL5hpyiusJ7vlTHPOVYFKzEOOk",
+          "mode": "list",
+          "cachedResultName": "Data Base of lead",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/191W_RrLTYDOM8bgXodL5hpyiusJ7vlTHPOVYFKzEOOk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1807673988,
+          "mode": "list",
+          "cachedResultName": "Outbound Calls",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/191W_RrLTYDOM8bgXodL5hpyiusJ7vlTHPOVYFKzEOOk/edit#gid=1807673988"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "To Number",
+              "lookupValue": "={{ $json.body.called_number }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        288,
+        32
+      ],
+      "id": "5f62cbb8-2371-4504-a0dc-82fe4bedcd80",
+      "name": "Get row(s) in sheet"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        496,
+        176
+      ],
+      "id": "78354b79-e362-4694-a58b-e318cf128b33",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "191W_RrLTYDOM8bgXodL5hpyiusJ7vlTHPOVYFKzEOOk",
+          "mode": "list",
+          "cachedResultName": "Data Base of lead",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/191W_RrLTYDOM8bgXodL5hpyiusJ7vlTHPOVYFKzEOOk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Lead data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/191W_RrLTYDOM8bgXodL5hpyiusJ7vlTHPOVYFKzEOOk/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Phone",
+              "lookupValue": "={{ $json.body.called_number }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        288,
+        192
+      ],
+      "id": "84ff8617-bf36-4bc6-846b-ed0c74950fb8",
+      "name": "Get row(s) in sheet1"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={ \n  \"type\": \"conversation_initiation_client_data\",   \n  \"dynamic_variables\": { \n    \"firstname\": \"{{ $json.first_name }}\", \n    \"sequence_day\": \"{{ $json.sequence_day }}\", \n    \"reminder\": \"{{ $json.reminder }}\", \n    \"last_transcript\": \"{{ $json.last_transcript }}\",\n    \"first_message\": \"{{ $json.message }}\"\n   } \n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        864,
+        1280
+      ],
+      "id": "a13a5bca-f86b-48af-a239-30e691998c21",
+      "name": "Respond to Webhook3"
+    },
+    {
+      "parameters": {
+        "content": "Elevenlab Getting Data From Booking Sheet",
+        "height": 336,
+        "width": 1056
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        1104
+      ],
+      "typeVersion": 1,
+      "id": "804cc467-2aef-4034-ada1-94be6f2da672",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "191W_RrLTYDOM8bgXodL5hpyiusJ7vlTHPOVYFKzEOOk",
+          "mode": "list",
+          "cachedResultName": "Data Base of lead",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/191W_RrLTYDOM8bgXodL5hpyiusJ7vlTHPOVYFKzEOOk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Lead data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/191W_RrLTYDOM8bgXodL5hpyiusJ7vlTHPOVYFKzEOOk/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Phone",
+              "lookupValue": "={{ $json.body.called_number }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        480,
+        1280
+      ],
+      "id": "18ef9734-c240-4880-b74b-1fbbce4b8c53",
+      "name": "Get row(s) in sheet3"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "lead-booking-data",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        64,
+        1296
+      ],
+      "id": "f60000f4-eb77-4b00-96df-00163fd7b0fa",
+      "name": "Webhook for booking ai",
+      "webhookId": "350efc07-25c6-4fcf-a6f3-b46dfbd3f082"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "booking-confirm",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        80,
+        1648
+      ],
+      "id": "96a1ebe4-ad21-4fcc-b1df-1570fc0f2c0d",
+      "name": "Webhook3",
+      "webhookId": "350efc07-25c6-4fcf-a6f3-b46dfbd3f082"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"type\": \"conversation_initiation_client_data\",\n  \"dynamic_variables\": {\n    \"firstname\": \"{{ $json['First Name'] }}\",\n    \"booking_date\": \"{{ $json['Booking Date'] }}\",\n    \"booking_time\": \"{{ $json['Booking time'] }}\"\n  }\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        688,
+        1648
+      ],
+      "id": "b18323e5-decc-4fc3-a492-083d44e48683",
+      "name": "Respond to Webhook4"
+    },
+    {
+      "parameters": {
+        "content": "Elevenlab Transferring Outbound Booking Call Transcript to Webhook ",
+        "height": 272,
+        "width": 864,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        16,
+        1552
+      ],
+      "typeVersion": 1,
+      "id": "2e076503-0581-40c9-a843-b16b9d1ea70b",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "191W_RrLTYDOM8bgXodL5hpyiusJ7vlTHPOVYFKzEOOk",
+          "mode": "list",
+          "cachedResultName": "Data Base of lead",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/191W_RrLTYDOM8bgXodL5hpyiusJ7vlTHPOVYFKzEOOk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1807673988,
+          "mode": "list",
+          "cachedResultName": "Outbound Calls",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/191W_RrLTYDOM8bgXodL5hpyiusJ7vlTHPOVYFKzEOOk/edit#gid=1807673988"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {
+            "To Number": "={{ $('Webhook3').item.json.body.data.conversation_initiation_client_data.dynamic_variables.system__called_number }}"
+          },
+          "matchingColumns": [
+            "To Number"
+          ],
+          "schema": [
+            {
+              "id": "Time Spam",
+              "displayName": "Time Spam",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Direction",
+              "displayName": "Direction",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "To Number",
+              "displayName": "To Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "From number",
+              "displayName": "From number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Transcript Day 0",
+              "displayName": "Transcript Day 0",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Summary Day 0",
+              "displayName": "Summary Day 0",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        480,
+        1648
+      ],
+      "id": "7cd6d1a7-0ae7-4efb-aca5-d0ef5044db62",
+      "name": "Append or update row in sheet1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $json.body.data;\nconst seqDay = body.conversation_initiation_client_data.dynamic_variables.sequence_day;\n\n// Extract day number from \"Day 0\"\nconst dayNumber = seqDay.replace(/\\D/g, \"\");\n\n// Exact column names in your sheet\nconst transcriptColumn = `Transcript Day ${dayNumber}`;\nconst summaryColumn = `Summary Day ${dayNumber}`;\n\n// Build transcript text\nlet transcriptText = body.transcript\n  .map(t => `${t.role.toUpperCase()}: ${t.message}`)\n  .join(\" \");\n\n// Trim phone numbers to avoid mismatches\nconst toNumber = body.metadata.phone_call.external_number.trim();\nconst fromNumber = body.metadata.phone_call.agent_number.trim();\n\nreturn [\n  {\n    json: {\n      \"To Number\": toNumber,                    // matches sheet\n      \"Time Spam\": new Date(body.metadata.start_time_unix_secs * 1000).toLocaleString(\"en-GB\"),\n      \"Direction\": body.metadata.phone_call.direction,  // matches sheet\n      \"From number\": fromNumber,                // matches sheet\n      [transcriptColumn]: transcriptText,      // dynamic day column\n      [summaryColumn]: body.analysis.call_summary_title // dynamic day column\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        288,
+        1648
+      ],
+      "id": "10b11051-8b4f-4419-aa28-0fecc1208991",
+      "name": "Code2"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get row(s) in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Booking DB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Booking DB": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook2": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append or update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet3": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook for booking ai": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook3": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append or update row in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "1a6100b2e52ae3c290d86af3a0507cd2e67a0cc99a26544ed00345df21ae1dd0"
+  }
+}
