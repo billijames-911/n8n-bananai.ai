@@ -1,0 +1,1588 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "unit": "minutes"
+      },
+      "id": "203493e8-b15b-46f6-bf24-8f76dc607272",
+      "name": "Wait 1 Minute",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [
+        -1744,
+        400
+      ],
+      "webhookId": "203a8dd6-e8c1-4d7b-980f-d29471784447",
+      "notes": "Day 0: Wait 1 minute after sequence initialization"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.tags && ($json.tags.includes('booked') || $json.tags.includes('booking-form-submitted')) }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "272d4d15-c1bf-4789-bb23-9a21b2497776",
+      "name": "Check If Booked Day 0",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        -1088,
+        384
+      ],
+      "notes": "If booked, end workflow immediately"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -1392,
+        384
+      ],
+      "id": "8eb939d3-d161-411e-9469-6725ac49e9f1",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.elevenlabs.io/v1/convai/twilio/outbound-call",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "xi-api-key",
+              "value": "sk_5fc6a2d55ae7a6bcf3d547d1dfa7a523d0544d669a6a6787"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "agent_id",
+              "value": "agent_3501k3yek057fzwtc3h76889sp2s"
+            },
+            {
+              "name": "agent_phone_number_id",
+              "value": "phnum_0401k3yetaz3e93vrdy1e42jvxv4"
+            },
+            {
+              "name": "to_number",
+              "value": "+966576908563"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -448,
+        400
+      ],
+      "id": "950b1812-880d-4bd2-aeeb-b998d0f45a65",
+      "name": "Eleven-lab call 1"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "191W_RrLTYDOM8bgXodL5hpyiusJ7vlTHPOVYFKzEOOk",
+          "mode": "list",
+          "cachedResultName": "Data Base of lead",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/191W_RrLTYDOM8bgXodL5hpyiusJ7vlTHPOVYFKzEOOk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1807673988,
+          "mode": "list",
+          "cachedResultName": "Outbound Calls",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/191W_RrLTYDOM8bgXodL5hpyiusJ7vlTHPOVYFKzEOOk/edit#gid=1807673988"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "To Number",
+              "lookupValue": "={{ $('Get a contact If they booked').item.json.phone }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -2464,
+        688
+      ],
+      "id": "8856e8cd-6f0d-4772-b5fd-d36944f40ff0",
+      "name": "Get Summary of transcript"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=\nThis is actual transcript day 0:{{ $json['Transcript Day 0'] }}.\n\nThis is summary 0:{{ $json['Summary Day 0'] }}\nNow time: {{ $now }}\n\n",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "SYSTEM PROMPT:\n\nYOU ARE AN EXPERT AI CALL CLASSIFICATION AGENT TRAINED TO ANALYZE OUTBOUND CALL TRANSCRIPTS AND ROUTE THEM INTO FIVE SPECIFIC CATEGORIES FOR n8n.\n\n### INSTRUCTIONS ###\n- Carefully read the call transcript.\n- The **current time** is provided as `now_time` in ISO format (e.g., 2025-08-28T14:46:39.173+03:00). Use this as the reference for all future reminders.\n- Classify each transcript into **exactly one** of these categories:\n  1. REMINDER\n  2. LEAD-OUT (opt-out)\n  3. NOT-PICKED\n  4. BOOKED\n\n---\n\n### CATEGORIES AND RULES ###\n\n1. **REMINDER**\n- Triggered when the client requests a future follow-up.\n- Examples: \"remind me later\", \"call me tomorrow morning\", \"call me in the afternoon\", \"send me an email reminder\", \"text me a reminder\".\n- Rules:\n  - Always return `\"classification\": \"reminder\"`.\n  - Include `\"reminder_type\"` as `\"call\"`, `\"sms\"`, or `\"email\"`:\n    - `\"call\"` → user says \"call me back\" or \"call me again\"\n    - `\"sms\"` → user says \"text me\" or \"send me an sms\"\n    - `\"email\"` → user says \"email me\"\n    - Default to `\"sms\"` if not specified\n  - Include `\"time\"` as an **ISO datetime in the future**, using the provided `now_time` as reference:\n    - \"remind me in 5 hours\" → `{{ $now.plus({ hours: 5 }).toISO() }}`\n    - \"remind me tomorrow morning\" → `{{ $now.plus({ days: 1 }).set({ hour: 9, minute: 0, second: 0 }).toISO() }}`\n    - \"call me this afternoon\" → pick the **next future afternoon hour** relative to `now_time`, e.g., `{{ $now.set({ hour: 15, minute: 0, second: 0 }).toISO() }}`\n  - If no time is specified, return `\"time\": null`.\n\n2. **LEAD-OUT**\n- Triggered when the client explicitly does NOT want further contact.\n- Keywords: \"stop\", \"don’t call me again\", \"remove me from your list\", \"unsubscribe\", \"never call again\", \"not interested\".\n- Output: `\"classification\": \"lead-out\"`, `\"booking_type\": null`, `\"time\": null`, `\"reminder_type\": null`.\n\n3. **NOT-PICKED**\n- Triggered if the call was not answered, when the transcript is null, went to voicemail, or user is unavailable.\n- Keywords: \"no answer\", \"not available\", \"didn’t pick\", \"busy tone\", \"left a voicemail\".\n- Output: `\"classification\": \"not-picked\"`, `\"booking_type\": null`, `\"time\": null`, `\"reminder_type\": null`.\n\n4. **BOOKED**\n- Triggered if the client agrees to a meeting or appointment.\n- Examples: \"Yes, let's book that\", \"I'll take the meeting\", \"book it for me now\".\n- Output: `\"classification\": \"booked\"`,  `\"booking_type\": sms or email`, `\"time\": null`, `\"reminder_type\": null`.\n- Rules:\n- Include `\"booking_type\"` as  `\"sms\"`, or `\"email\"`:\n    - `\"sms\"` → user says \"send me booking link via sms\" or \"send me an booking link on sms\"\n    - `\"email\"` → user says \"email me the booking link \", \"send me booking link via sms\" or \"send me an booking link on sms\"\n    - Default to `\"email\"` if not specified\n---\n\n### EDGE CASES ###\n- If the user says both \"remind me\" and \"don't call me again\", **prioritize LEAD-OUT**.\n- If the user agrees to a meeting, **prioritize BOOKED**.\n\n---\n\n### OUTPUT FORMAT ###\nAlways return exactly this JSON structure (valid JSON, no comments):\n\n{\n  \"classification\": \"reminder | lead-out | not-picked | booked\",\n  \"time\": \"ISO datetime format if reminder includes a time, else null\",\n  \"reminder_type\": \"call | sms | email, else null\"\n  \"booking_type\": \"sms | email, else null,\n}\n\n**Notes:**\n- `\"time\"` must be **null** if not a reminder or if no time specified.\n- `\"reminder_type\"` must be **null** if not a reminder.\n- Do not include extra text, explanations, or formatting outside the JSON.\n- Use the provided `now_time` as the reference for all dynamic time calculations.\n- Here’s a recommended table in 12-hour format (LA time):\n\nPart of Day\tStarts At\tEnds At\tNotes\nMidnight\t12:00 AM\t12:59 AM\tNot suitable for clinic reminders\nEarly Morning\t6:00 AM\t7:59 AM\tBefore business hours; some early risers\nMorning\t8:00 AM\t11:59 AM\tClinic opening hours; ideal for reminders\nNoon\t12:00 PM\t12:59 PM\tMidday break; okay for reminders\nAfternoon\t1:00 PM\t4:59 PM\tActive clinic hours; good for reminders\nEvening\t5:00 PM\t7:00 PM\tClosing hours; okay for last call reminders\nNight\t7:01 PM\t11:59 PM\tNot ideal; outside typical business hours\n\nNotes / Adjustments for MedSpas & Clinics:\n\nAvoid reminders during very early morning (1–5:59 AM) or late night (after 7 PM).\n\nDefault morning reminders → 9:00 AM\n\nDefault afternoon reminders → 2:00 PM\n\nDefault evening reminders → 6:00 PM\n---\n\n### EXAMPLES ###\n\n**Example 1:**  \nTranscript: \"Can you call me tomorrow morning at 9am?\"  \nNow_time: \"2025-08-28T14:46:39.173+03:00\"  \nOutput:  \n{\n  \"classification\": \"reminder\",\n  \"time\": \"{{ $now.plus({ days: 1 }).set({ hour: 9, minute: 0, second: 0 }).toISO() }}\",\n  \"reminder_type\": \"call\"\n}\n\n**Example 2:**  \nTranscript: \"Please don’t contact me again via SMS.\"  \nNow_time: \"2025-08-28T14:46:39.173+03:00\"  \nOutput:  \n{\n  \"classification\": \"lead-out\",\n  \"booking_type\": null,\n  \"time\": null,\n  \"reminder_type\": null\n}\n\n**Example 3:**  \nTranscript: \"The number you have dialed is not available.\"  \nNow_time: \"2025-08-28T14:46:39.173+03:00\"  \nOutput:  \n{\n  \"classification\": \"not-picked\",\n  \"booking_type\": null,\n  \"time\": null,\n  \"reminder_type\": null\n}\n\n\n**Example 5:**  \nTranscript: \"That sounds good, I'll take that meeting, send booking link via email\"  \nNow_time: \"2025-08-28T14:46:39.173+03:00\"  \nOutput:  \n{\n  \"classification\": \"booked\",\n  \"booking_type\": email,\n  \"time\": null,\n  \"reminder_type\": null\n}\n\n**Example 6:**  \nTranscript: \"Can you send me an email reminder next week?\"  \nNow_time: \"2025-08-28T14:46:39.173+03:00\"  \nOutput:  \n{\n  \"classification\": \"reminder\",\n  \"booking_type\": null,\n  \"time\": \"{{ $now.plus({ days: 7 }).toISO() }}\",\n  \"reminder_type\": \"email\"\n}\n"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        -2112,
+        688
+      ],
+      "id": "1909b41c-245d-4983-b38c-7cca46d7b9f2",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-4o-mini",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -2128,
+        896
+      ],
+      "id": "8bce7ede-ba6a-478a-be9b-c25b9899b0c5",
+      "name": "OpenRouter Chat Model"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        -1088,
+        880
+      ],
+      "id": "90f50362-1f8d-44de-bf84-73472ebd3762",
+      "name": "Delete a contact"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "contactId": "uh8ZXbxgiiPqAwxCXb7b",
+        "updateFields": {
+          "tags": "={{ $json.tags.concat(['pause-reminder']) }}"
+        },
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        -960,
+        640
+      ],
+      "id": "ed6a9094-932f-4d13-8bac-c33e080d35f4",
+      "name": "Update a contact tag pause-reminder"
+    },
+    {
+      "parameters": {
+        "resume": "specificTime",
+        "dateTime": "={{ $now.plus({ days: 2 }).set({ hour: 18, minute: 0, second: 0 }).toISO() }}"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -784,
+        640
+      ],
+      "id": "8f861978-b607-496e-997b-b16b24d85835",
+      "name": "Wait for desired time",
+      "webhookId": "90a4e27b-c45b-4ee8-a0bc-2a62c3b13d19"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "3b7ab24a-966e-469e-998c-4f024b85b617",
+              "leftValue": "={{ $('Code1').item.json.reminder_type }}",
+              "rightValue": "call",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -368,
+        640
+      ],
+      "id": "a8ef29a1-6f1b-4f77-a9cb-6c83ba4c1c42",
+      "name": "If reminder is for Call or Email + SMS"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.elevenlabs.io/v1/convai/twilio/outbound-call",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "xi-api-key",
+              "value": "sk_e4ae676140a1d5d11015e296faa7596fd26012966272b96d"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "agent_id",
+              "value": "agent_1801k38s4rpkfdjbm39mpqe3s2hd"
+            },
+            {
+              "name": "agent_phone_number_id",
+              "value": "phnum_3701k39wsmeef54t2r60m9j9eev0"
+            },
+            {
+              "name": "to_number",
+              "value": "+966576908563"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        528,
+        640
+      ],
+      "id": "bbd3c5f6-d08b-4b8b-923e-f3c1670ee5a2",
+      "name": "Eleven-lab calls for reminder"
+    },
+    {
+      "parameters": {
+        "subject": "Your appointment reminder – Yellow Rock House",
+        "emailType": "text",
+        "message": "=Hi {{leadName}},\n\nAs you requested during our recent call, here’s your reminder from Yellow Rock House.\nYou can book your appointment anytime using the link below:\n\n👉 Book Your Appointment Here\n\nWe look forward to seeing you soon!\n\nBest regards,\nYellow Rock House Team",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        512,
+        832
+      ],
+      "id": "9f5df7d2-d90f-47e5-93c1-183423ab326a",
+      "name": "Send a reminder email",
+      "webhookId": "c7b5aa45-82c8-47e0-9c9b-ab9abbf6cf8a"
+    },
+    {
+      "parameters": {
+        "message": "=Hi {{leadName}}, this is a reminder from Yellow Rock House. You can book your appointment anytime here: {{bookingLink}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        704,
+        832
+      ],
+      "id": "83589e38-6cde-45dc-b92d-3d417096bd07",
+      "name": "Send an reminder sms"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.classification }}",
+                    "rightValue": "reminder",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "620d8e74-2eeb-4b51-b590-bc64ff01c404"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "reminder"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "69a956dc-77a2-4cc4-8127-a5420ab4331f",
+                    "leftValue": "={{ $json.classification }}",
+                    "rightValue": "lead-out",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "lead-out"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "817d783e-7227-415d-b1cb-6282f2a92467",
+                    "leftValue": "={{ $json.classification }}",
+                    "rightValue": "not-picked",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "not-picked"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b13a6c6c-f0fe-41c8-8ddf-df03b1a6f44f",
+                    "leftValue": "={{ $json.classification }}",
+                    "rightValue": "booked",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "booked"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -1520,
+        656
+      ],
+      "id": "584502b0-f0fe-4083-83e6-fddafba176ba",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "jsCode": "let aiText = null;\n\n// Try multiple possible locations for AI output\nif (items[0].json.response?.generations?.[0]?.[0]?.text) {\n    aiText = items[0].json.response.generations[0][0].text;\n} else if (items[0].json.text) {\n    aiText = items[0].json.text;\n} else {\n    throw new Error(\"AI output not found\");\n}\n\n// Remove any ```json or ``` markdown\naiText = aiText.replace(/```json\\s*/g, '').replace(/```/g, '').trim();\n\n// Try parsing JSON\nlet parsed = null;\ntry {\n    parsed = JSON.parse(aiText);\n} catch (err) {\n    throw new Error(\"Failed to parse AI JSON output\");\n}\n\n// If the AI returned the object under \"output\", use that; otherwise fallback\nconst output = parsed.output ?? parsed;\n\n// Ensure all required fields exist\nconst classification = output.classification ?? null;\nconst time = output.time ?? null;\nconst reminder_type = output.reminder_type ?? null;\nconst booking_type = output.booking_type ?? null; // <-- added field\n\n// Return properly formatted n8n object\nreturn [\n    {\n        json: {\n            classification,\n            time,\n            reminder_type,\n            booking_type // <-- included in output\n        }\n    }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1760,
+        688
+      ],
+      "id": "8a147d8a-288f-42da-91e0-5718c6722c85",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "contactId": "=uh8ZXbxgiiPqAwxCXb7b",
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        -1136,
+        640
+      ],
+      "id": "1a226818-0e1c-4ed1-ac57-daa0f55dd9a0",
+      "name": "Get a contact17"
+    },
+    {
+      "parameters": {
+        "subject": "=Client Removal Update – {{clientName}} (Yellow Rock House)",
+        "emailType": "text",
+        "message": "=Hi Team,  \n\nDuring our recent outbound call, {{clientName}} requested to be removed from further communication. As per their request, we have now removed them from our contact list.  \n\nPlease ensure that:  \n - No further calls or follow-ups are made to this client.  \n - All records in CRM/n8n are updated accordingly.  \n - Any scheduled reminders or campaigns related to this client are canceled.  \n\nThanks for keeping everything up to date and respecting client preferences.  \n\nBest regards, \nYellow Rock House Team",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -832,
+        880
+      ],
+      "id": "1b8c276c-c081-4fc9-8a18-a6ca14d0a6ad",
+      "name": "Send a message",
+      "webhookId": "55b50f56-8e90-4d7b-acef-9dd4f6ce08f7"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        -2096,
+        1328
+      ],
+      "id": "4a5db88a-a113-4ef5-8762-cac50e6b755c",
+      "name": "Thanks for booking sms"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "2f9ccb6d-d137-48eb-8e64-10511fa5ec12",
+              "leftValue": "={{ $json.booking_type }}",
+              "rightValue": "sms",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -2400,
+        1360
+      ],
+      "id": "b4840ccb-1619-4202-911f-05ef90583134",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "subject": "=Booking link as promised – Yellow Rock House",
+        "emailType": "text",
+        "message": "=Hi {{leadName}},  \n\nThank you for agreeing to book your appointment with Yellow Rock House. \nYou can confirm your slot anytime using the link below:  👉 Book Your Appointment Here  \n\nWe appreciate your time and look forward to seeing you soon!  \n\nBest regards, \nYellow Rock House Team",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -2096,
+        1552
+      ],
+      "id": "aae78a75-bf93-41b6-b5c7-0ddcd72eef89",
+      "name": "Send a message3",
+      "webhookId": "abda3e9f-8b31-419a-9e49-84b4796d630c"
+    },
+    {
+      "parameters": {
+        "subject": "=New Lead Ready to Book – {{leadName}}",
+        "emailType": "text",
+        "message": "=Hi Team,\n\nWe have a new lead who has agreed on the call to book an appointment with Yellow Rock House.\n\nLead Name: {{leadName}}\nBooking Link: {{bookingLink}}\n\nPlease make sure to follow up and assist them promptly.\n\nThanks for your attention!\n\nBest regards,\nYellow Rock House Team",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -1520,
+        1440
+      ],
+      "id": "9989d27e-4fd0-4893-a92f-9b8aa4032e75",
+      "name": "Notifying Team",
+      "webhookId": "6385279f-f8d4-4a19-a7d7-c040936992c4"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "191W_RrLTYDOM8bgXodL5hpyiusJ7vlTHPOVYFKzEOOk",
+          "mode": "list",
+          "cachedResultName": "Data Base of lead",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/191W_RrLTYDOM8bgXodL5hpyiusJ7vlTHPOVYFKzEOOk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Lead data",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/191W_RrLTYDOM8bgXodL5hpyiusJ7vlTHPOVYFKzEOOk/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Reminder": "yes",
+            "Phone": "={{ $json.phone }}"
+          },
+          "matchingColumns": [
+            "Phone"
+          ],
+          "schema": [
+            {
+              "id": "Contact ID",
+              "displayName": "Contact ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Clinic Name",
+              "displayName": "Clinic Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "First Name",
+              "displayName": "First Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Last Name",
+              "displayName": "Last Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Time spam",
+              "displayName": "Time spam",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Source",
+              "displayName": "Source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Reminder",
+              "displayName": "Reminder",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Follow up day",
+              "displayName": "Follow up day",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -608,
+        640
+      ],
+      "id": "8ed2a4aa-c8ab-42cb-9098-e94586484c31",
+      "name": "Last Conversation"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "contactId": "=uh8ZXbxgiiPqAwxCXb7b",
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        80,
+        624
+      ],
+      "id": "8e7291e1-f2ee-455a-92a1-5c5047467a89",
+      "name": "Get a contact"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "contactId": "=uh8ZXbxgiiPqAwxCXb7b",
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        80,
+        816
+      ],
+      "id": "d4a03c06-5da7-4b14-a567-e15b02180a77",
+      "name": "Get a contact4"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.tags && ($json.tags.includes('booked') || $json.tags.includes('booking-form-submitted')) }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "235588c0-8c22-4d38-825f-a26f09983762",
+      "name": "Check If Booked Day 1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        288,
+        624
+      ],
+      "notes": "If booked, end workflow immediately"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.tags && ($json.tags.includes('booked') || $json.tags.includes('booking-form-submitted')) }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "bd9b7de7-07ac-4aed-8b50-a668590c9776",
+      "name": "Check If Booked Day 2",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        256,
+        816
+      ],
+      "notes": "If booked, end workflow immediately"
+    },
+    {
+      "parameters": {
+        "amount": 20,
+        "unit": "minutes"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -16,
+        144
+      ],
+      "id": "8a2f3f4a-d01f-44ef-88ed-325fbd48f884",
+      "name": "Wait",
+      "webhookId": "ce889f13-9f0e-467a-9768-c741c6daab0a"
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "contact_id",
+              "value": "=4b6pAJRlE7IH539DZZBq"
+            },
+            {
+              "name": "firstName",
+              "value": "={{ $json.body.first_name }}"
+            },
+            {
+              "name": "phone",
+              "value": "={{ $json.body.phone }}"
+            },
+            {
+              "name": "sequence_day",
+              "value": "0"
+            },
+            {
+              "name": "booking_link",
+              "value": "https://bit.ly/3A51SCONNECT"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c717add8-1b18-46be-a48b-16d9b1e358f3",
+      "name": "Format Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        -2096,
+        400
+      ],
+      "notes": "Initialize tracking variables for 14-day AI call sequence"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "contactId": "=41zAmWMqvFwZ8VVaEfG9",
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        -1552,
+        176
+      ],
+      "id": "8839f1b0-89cb-4744-b591-4644227f3c2d",
+      "name": "Get a contact If they booked"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "191W_RrLTYDOM8bgXodL5hpyiusJ7vlTHPOVYFKzEOOk",
+          "mode": "list",
+          "cachedResultName": "Data Base of lead",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/191W_RrLTYDOM8bgXodL5hpyiusJ7vlTHPOVYFKzEOOk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/191W_RrLTYDOM8bgXodL5hpyiusJ7vlTHPOVYFKzEOOk/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Follow up day": "Day 2",
+            "Contact ID": "={{ $json.id }}"
+          },
+          "matchingColumns": [
+            "Contact ID"
+          ],
+          "schema": [
+            {
+              "id": "Contact ID",
+              "displayName": "Contact ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Clinic Name",
+              "displayName": "Clinic Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "First Name",
+              "displayName": "First Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Last Name",
+              "displayName": "Last Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Time spam",
+              "displayName": "Time spam",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Source",
+              "displayName": "Source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Follow up day",
+              "displayName": "Follow up day",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -768,
+        400
+      ],
+      "id": "58f2d0e0-47e7-40ec-b4e0-c2a5339b8326",
+      "name": "Add the follow up day 0 in column"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "1d65c0a3-c3e1-430b-a9e3-661f26df93c0",
+              "leftValue": "={{ $json.success }}",
+              "rightValue": "True",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -192,
+        400
+      ],
+      "id": "81575b8c-1888-42e3-ab96-5581d842146f",
+      "name": "If Call Success or Not"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        128,
+        416
+      ],
+      "id": "f78199bd-509e-4a15-af78-87748df33c5c",
+      "name": "Send a message to notify team of failur",
+      "webhookId": "12ddcc4a-222a-4c5f-842a-a9d425c632b0"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "updateFields": {
+          "tags": ""
+        },
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        736,
+        640
+      ],
+      "id": "1882a780-c80f-494e-a4a0-a28527f3414b",
+      "name": "Remove pause-reminder tag from contact"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "updateFields": {
+          "tags": ""
+        },
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        928,
+        864
+      ],
+      "id": "4b3a2c1e-8ee7-4e00-a781-eda0564e1edb",
+      "name": "Remove pause-reminder tag from contact1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://yellowrockhouse.app.n8n.cloud/webhook-test/next-day",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1152,
+        640
+      ],
+      "id": "62eb3e44-df2d-4378-b28a-3928b963f88c",
+      "name": "HTTP Request for Day "
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://yellowrockhouse.app.n8n.cloud/webhook-test/next-day",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1248,
+        864
+      ],
+      "id": "a2d228f9-02c9-4e63-98d5-8dff710310d8",
+      "name": "HTTP Request for Day 2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://yellowrockhouse.app.n8n.cloud/webhook-test/next-day-2",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        464,
+        384
+      ],
+      "id": "7431c57d-740f-41a0-bb20-3d7bf26a4db3",
+      "name": "HTTP Request for Day 6"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "next-day-13",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -2960,
+        384
+      ],
+      "id": "ac92c917-081b-4adc-bd3a-c332ac5b6f87",
+      "name": "Webhook",
+      "webhookId": "f8b586ba-9155-457d-92de-a0888306650b"
+    },
+    {
+      "parameters": {
+        "amount": 24,
+        "unit": "={{ $now.plus({ days: 1 }).set({ hour: 17, minute: 30, second: 0, millisecond: 0 }).toISO() }}\n_"
+      },
+      "id": "c20bf23e-3b1e-422a-8a24-32ff90df7d4c",
+      "name": "Wait 24 Hours Day ",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [
+        -2720,
+        384
+      ],
+      "webhookId": "4ad6f61c-743a-4d05-8066-806038ff1c02",
+      "notes": "Wait 24 hours for Day 1 sequence"
+    },
+    {
+      "parameters": {
+        "message": "=Hey [Name], okay — we’re officially in awkward territory now 😅\nI promise this is probably the last follow-up for a while — it’s starting to feel like we’re chasing an ex haha. \nTotally get it if now’s not the right time, just let us know either way. No hard feelings! ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        -1328,
+        768
+      ],
+      "id": "0188065d-0cc2-4167-8292-f7b1e4faeb54",
+      "name": "Send an SMS/MMS/WhatsApp message"
+    }
+  ],
+  "connections": {
+    "Wait 1 Minute": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "Get a contact If they booked",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check If Booked Day 0": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Add the follow up day 0 in column",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Check If Booked Day 0",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Eleven-lab call 1": {
+      "main": [
+        [
+          {
+            "node": "If Call Success or Not",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Summary of transcript": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete a contact": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a contact tag pause-reminder": {
+      "main": [
+        [
+          {
+            "node": "Wait for desired time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait for desired time": {
+      "main": [
+        [
+          {
+            "node": "Last Conversation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If reminder is for Call or Email + SMS": {
+      "main": [
+        [
+          {
+            "node": "Get a contact",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get a contact4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Eleven-lab calls for reminder": {
+      "main": [
+        [
+          {
+            "node": "Remove pause-reminder tag from contact",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a reminder email": {
+      "main": [
+        [
+          {
+            "node": "Send an reminder sms",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send an reminder sms": {
+      "main": [
+        [
+          {
+            "node": "Remove pause-reminder tag from contact1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Get a contact17",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Delete a contact",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [],
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a contact17": {
+      "main": [
+        [
+          {
+            "node": "Update a contact tag pause-reminder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Thanks for booking sms": {
+      "main": [
+        [
+          {
+            "node": "Notifying Team",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Thanks for booking sms",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message3": {
+      "main": [
+        [
+          {
+            "node": "Notifying Team",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Last Conversation": {
+      "main": [
+        [
+          {
+            "node": "If reminder is for Call or Email + SMS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a contact": {
+      "main": [
+        [
+          {
+            "node": "Check If Booked Day 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a contact4": {
+      "main": [
+        [
+          {
+            "node": "Check If Booked Day 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check If Booked Day 1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Eleven-lab calls for reminder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check If Booked Day 2": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Send a reminder email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Get Summary of transcript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Data": {
+      "main": [
+        [
+          {
+            "node": "Wait 1 Minute",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a contact If they booked": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add the follow up day 0 in column": {
+      "main": [
+        [
+          {
+            "node": "Eleven-lab call 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If Call Success or Not": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message to notify team of failur",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message to notify team of failur": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request for Day 6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove pause-reminder tag from contact": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request for Day ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove pause-reminder tag from contact1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request for Day 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Wait 24 Hours Day ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 24 Hours Day ": {
+      "main": [
+        [
+          {
+            "node": "Format Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {
+    "Eleven-lab calls for reminder": [
+      {
+        "success": true,
+        "message": "b'Success'",
+        "conversation_id": "conv_6401k3hqxwvne73869xnzjrym1ra",
+        "callSid": "CA4ff9271179d8e9f529bc7d4b5606ec0b"
+      }
+    ]
+  },
+  "meta": {
+    "instanceId": "1a6100b2e52ae3c290d86af3a0507cd2e67a0cc99a26544ed00345df21ae1dd0"
+  }
+}
