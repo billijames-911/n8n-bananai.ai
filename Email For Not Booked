@@ -1,0 +1,1661 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Email Nurturizing",
+        "height": 4672,
+        "width": 1808
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "6821d15b-c557-42cf-bd4d-7b5f5d796dec",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "contactId": "={{ $json.body.contact_id }}",
+        "requestOptions": {}
+      },
+      "id": "1a5c298c-fccf-4ca6-beba-ba14a3db12b3",
+      "name": "Get Contact Day 0",
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        816,
+        416
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.body.tags && ($json.body.tags.includes('booked') || $json.body.tags.includes('booking-form-submitted')) }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "a6df27a9-75c3-4354-a97f-13dec5dad042",
+      "name": "Check If Booked Day 0",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        416
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "You're in. Let's keep this simple.",
+        "emailType": "text",
+        "message": "=Hi {{ $json.firstName }},\n\nThanks for joining us — you're about to see how PreSold Leads AI™ turns interest into booked calls without chasing or spamming.\n\nHere's what you'll get over the next few days:\n✅ Pre-selling video system\n✅ Smart automations (SMS, email, voicemail)\n✅ Booking flows that feel personal\n\nLet's make your time count: {{ $json['booking link'] }}\n\n— Ting, Founder, Yellow Rock House",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1264,
+        416
+      ],
+      "id": "ddb41912-68ba-47a3-9ae7-28291549588b",
+      "name": "Send Email Day 0",
+      "webhookId": "f5ba58a5-ada5-4564-8fd0-14197871bc4f"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "contactId": "={{ $json.body.contact_id }}",
+        "requestOptions": {}
+      },
+      "id": "94ce1e17-efde-43c5-a7af-36cb30fc0b19",
+      "name": "Get Contact Day 1",
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        832,
+        720
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "Most founders stay stuck here. You don't have to.",
+        "emailType": "text",
+        "message": "Hey {{ $json.firstName }},\n\nYou've got something valuable. But many founders struggle because the system behind their leads is weak.\n\nPreSold Leads AI™ handles what most founders avoid:\n✅ Capturing attention clearly\n✅ Following up automatically\n✅ Filling your calendar with real buyers\n\nDon't wait — {{ $json['booking link'] }}\n\n— Ting",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1280,
+        720
+      ],
+      "id": "5219f2ee-8527-4352-b33d-0a05fcbc538c",
+      "name": "Send Email Day 1",
+      "webhookId": "76b9b36a-224a-4dd4-a17f-68a072c3e149"
+    },
+    {
+      "parameters": {
+        "amount": 1,
+        "unit": "days"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1488,
+        720
+      ],
+      "id": "811f2a38-6433-4d77-834c-8ea7e452faa8",
+      "name": "Wait Day 2",
+      "webhookId": "892fa8e5-9201-4d40-8898-b0b7cea13ada"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "contactId": "={{ $json.body.contact_id }}",
+        "requestOptions": {}
+      },
+      "id": "93824b3f-41a3-429f-8f1a-f8695d7f4c5c",
+      "name": "Get Contact Day 2",
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        800,
+        1024
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.body.tags && ($json.body.tags.includes('booked') || $json.body.tags.includes('booking-form-submitted')) }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "65104a84-178c-46c1-8af3-c72ca75c2ce4",
+      "name": "Check If Booked Day 2",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1024,
+        1024
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "Posting more won't get you more clients",
+        "emailType": "text",
+        "message": "Hi {{ $json.firstName }},\n\nMore content doesn't automatically mean more clients. Without a system, it's just shouting into the void.\n\nWith PreSold Leads AI™ you can:\n✅ Post once — still convert daily\n✅ Automate follow-up across channels\n✅ Pre-qualify and book real sales calls\n\nReady to see how it works? {{ $json['booking link'] }}\n\n— Ting",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1248,
+        1024
+      ],
+      "id": "663bc4ea-54dd-47e5-b34d-45bd0986c02f",
+      "name": "Send Email Day 2",
+      "webhookId": "8658f25d-2c53-4b5d-8c68-7fdf14ed4c06"
+    },
+    {
+      "parameters": {
+        "amount": 1,
+        "unit": "days"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1472,
+        416
+      ],
+      "id": "a36bab50-f39a-4d11-947e-d346c7ae22d5",
+      "name": "Wait Day ",
+      "webhookId": "00cd1d7d-3458-4fb3-b0b4-3199f696d3f2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.body.tags && ($json.body.tags.includes('booked') || $json.body.tags.includes('booking-form-submitted')) }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "67ef8a7b-6487-4df6-bcaf-80e972fdbc76",
+      "name": "Check If Booked Day 4",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1056,
+        720
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "contact_id",
+              "value": "={{ $json.body.contact_id }}"
+            },
+            {
+              "name": "firstName",
+              "value": "={{ $json.body.firstName }}"
+            },
+            {
+              "name": "email",
+              "value": "={{ $json.body.email }}"
+            },
+            {
+              "name": "booking link",
+              "value": "https://api.leadconnectorhq.com/widget/booking/W8QcIllkRPKyS76yvPEZ"
+            },
+            {
+              "name": "video training",
+              "value": "={{ $json.body['vsl video link'] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c60551d8-98d3-4382-a62f-10d9939b3357",
+      "name": "Initialize Sequence1",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        464,
+        384
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"status\": \"success\", \"message\": \"Email Initialized\" } }}",
+        "options": {}
+      },
+      "id": "a9c8c443-8fa4-43c3-94d6-0186f719c5c3",
+      "name": "Tracking Response1",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        288,
+        384
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "start-email-nurture",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        80,
+        384
+      ],
+      "id": "91bbf319-8888-49e9-b247-cc68c15611a6",
+      "name": "Webhook",
+      "webhookId": "9cb20c2e-eac4-4e70-bffd-4ea28b079c19"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "contactId": "={{ $json.body.contact_id }}",
+        "requestOptions": {}
+      },
+      "id": "da0d8e4e-bd62-4d5e-9846-1901882bce96",
+      "name": "Get Contact Day 3",
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        784,
+        1296
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "Why we only take 3 clients per month",
+        "emailType": "text",
+        "message": "Hey {{ $json.firstName }},\n\nWe only take on 3 clients each month — not because we can't handle more, but because we go deep.\n\nYour PreSold Leads AI™ is built inside your brand, with your tone and goals.\n\nLet's scale in a clean, calm way: {{ $json['booking link'] }}\n\n— Ting",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1232,
+        1296
+      ],
+      "id": "7d43cb01-aeea-43c5-b8a5-6e06a8003e26",
+      "name": "Send Email Day 3",
+      "webhookId": "95ba8373-d9e9-4cb4-a30a-22f3b942e33a"
+    },
+    {
+      "parameters": {
+        "amount": 1,
+        "unit": "days"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1440,
+        1296
+      ],
+      "id": "3a795c02-f2b3-4c49-a977-66aa8408e1d4",
+      "name": "Wait Day 4",
+      "webhookId": "d76ffa58-bde3-4ab2-9892-3cc82b991be2"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "contactId": "={{ $json.body.contact_id }}",
+        "requestOptions": {}
+      },
+      "id": "9045eec0-fbc7-4e60-a994-2672de4e4c8d",
+      "name": "Get Contact Day 4",
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        784,
+        1584
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "Avoid these common pitfalls",
+        "emailType": "text",
+        "message": "Hi {{ $json.firstName }},\n\nMost lead systems fail because they overcomplicate the process. PreSold Leads AI™ focuses on what works: clarity, follow-up, and automation.\n\nDon't waste another day: {{ $json['booking link'] }}\n\n— Ting",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1232,
+        1584
+      ],
+      "id": "1c42e07b-4d7b-47ef-9e04-98a8bfef27b5",
+      "name": "Send Email Day 4",
+      "webhookId": "2ae4884c-21f0-4c36-8f5d-4d1b6f4c1994"
+    },
+    {
+      "parameters": {
+        "amount": 1,
+        "unit": "days"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1440,
+        1584
+      ],
+      "id": "dd604846-eab8-4d50-b34c-35e5c9a30820",
+      "name": "Wait Day 5",
+      "webhookId": "e6c4ec08-4bfe-4da1-8dbd-ea04e64a57f2"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "contactId": "={{ $json.body.contact_id }}",
+        "requestOptions": {}
+      },
+      "id": "6f40716f-097e-439c-912e-ab3521743b55",
+      "name": "Get Contact Day 5",
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        768,
+        1824
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.body.tags && ($json.body.tags.includes('booked') || $json.body.tags.includes('booking-form-submitted')) }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "6010ff4a-1340-498b-a780-a1ff13f8c39b",
+      "name": "Check If Booked Day 5",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        992,
+        1824
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "Real clients. Real results.",
+        "emailType": "text",
+        "message": "Hey {{ $json.firstName }},\n\nOne of our clients said: \"This system made me predictable — I don't wake up anxious anymore.\"\n\nImagine that for your business. See how: {{ $json['booking link'] }}\n\n— Ting",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1216,
+        1824
+      ],
+      "id": "10c99861-bcef-4c50-bec3-e6b6d2b70148",
+      "name": "Send Email Day 5",
+      "webhookId": "a6d58cf6-ad2a-436b-b941-7b3a2bd27d82"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.body.tags && ($json.body.tags.includes('booked') || $json.body.tags.includes('booking-form-submitted')) }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "81f85d2e-ff88-4542-ad3c-fa802aa8c72c",
+      "name": "Check If Booked Day 7",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1008,
+        1296
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.body.tags && ($json.body.tags.includes('booked') || $json.body.tags.includes('booking-form-submitted')) }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "d02905f6-8c90-44ff-80d7-d3c4cfdc7922",
+      "name": "Check If Booked Day 9",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1008,
+        1584
+      ]
+    },
+    {
+      "parameters": {
+        "amount": 1,
+        "unit": "days"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1520,
+        1024
+      ],
+      "id": "a7ce4572-0646-447e-8192-170dbda59b1c",
+      "name": "Wait Day 3 ",
+      "webhookId": "892fa8e5-9201-4d40-8898-b0b7cea13ada"
+    },
+    {
+      "parameters": {
+        "amount": 1,
+        "unit": "days"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1440,
+        1824
+      ],
+      "id": "e2372fde-ec2b-4b7b-878f-2fb94808affa",
+      "name": "Wait For Day 6",
+      "webhookId": "e6c4ec08-4bfe-4da1-8dbd-ea04e64a57f2"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "contactId": "={{ $json.body.contact_id }}",
+        "requestOptions": {}
+      },
+      "id": "003e9bfb-3e29-4f41-ba47-1dc7c147e540",
+      "name": "Get Contact Day 6",
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        768,
+        2032
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "Quick tip to improve bookings",
+        "emailType": "text",
+        "message": "Hi {{ $json.firstName }},\n\nA small tweak in your follow-up can drastically increase booked calls. PreSold Leads AI™ handles this automatically for you.\n\nTest it out: {{ $json['booking link'] }}\n\n— Ting",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1216,
+        2032
+      ],
+      "id": "08c8faee-4bba-42cc-89f2-1b9f56a2273e",
+      "name": "Send Email Day 6",
+      "webhookId": "9d6b79c9-4c15-4df8-9178-fcff5cf72c3d"
+    },
+    {
+      "parameters": {
+        "amount": 1,
+        "unit": "days"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1424,
+        2032
+      ],
+      "id": "5f4b99aa-da4f-4f1d-9aa0-197cce77c8d7",
+      "name": "Wait Day 7",
+      "webhookId": "a31f6e31-960b-442f-aa38-450451564fa5"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "contactId": "={{ $json.body.contact_id }}",
+        "requestOptions": {}
+      },
+      "id": "1aedb259-e640-480a-82f5-67b98eae471b",
+      "name": "Get Contact Day 7",
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        768,
+        2368
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "Real question: what if nothing changes?",
+        "emailType": "text",
+        "message": "Hey {{ $json.firstName }},\n\nIf you stay where you are — inconsistent leads, manual follow-up, random growth — what's the cost in time and energy?\n\nChange it today: {{ $json['booking link'] }}\n\n— Ting",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1216,
+        2368
+      ],
+      "id": "e5f87fe3-dd43-4cc6-abd8-4181fc40e81c",
+      "name": "Send Email Day 7",
+      "webhookId": "0eb18e64-4539-4d6d-bb1f-1eb4678eab82"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "contactId": "={{ $json.body.contact_id }}",
+        "requestOptions": {}
+      },
+      "id": "572f39f3-d862-405a-bb54-26b285b93cf2",
+      "name": "Get Contact Day 8",
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        752,
+        2672
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "See how the system actually works",
+        "emailType": "text",
+        "message": "Hi {{ $json.firstName }},\n\nHere's a peek behind the curtain of PreSold Leads AI™ — automation, booking flows, and follow-up in action.\n\nCurious? {{ $json['booking link'] }}\n\n— Ting",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1200,
+        2672
+      ],
+      "id": "28523b4f-1ff5-4179-a687-74b6386a7f1f",
+      "name": "Send Email Day 8",
+      "webhookId": "b47d4c42-f157-4715-90e1-69b2e1a1d5ed"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.body.tags && ($json.body.tags.includes('booked') || $json.body.tags.includes('booking-form-submitted')) }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "32b0fca0-f126-4adf-aadc-2d55640c60dc",
+      "name": "Check If Booked Day 11",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        992,
+        2032
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.body.tags && ($json.body.tags.includes('booked') || $json.body.tags.includes('booking-form-submitted')) }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "a93d6df3-c8ce-4039-a346-7dd4a16f7566",
+      "name": "Check If Booked Day 12",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        992,
+        2368
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.body.tags && ($json.body.tags.includes('booked') || $json.body.tags.includes('booking-form-submitted')) }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "80dc81fb-af39-4d2c-a74e-d6aff4f4508c",
+      "name": "Check If Booked Day 13",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        976,
+        2672
+      ]
+    },
+    {
+      "parameters": {
+        "amount": 1,
+        "unit": "days"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1424,
+        2368
+      ],
+      "id": "68490e77-17ad-401a-bafe-64630fd807ea",
+      "name": "Wait For Day 8",
+      "webhookId": "7d43311c-c9b4-4941-8e69-a35ebb2c1bfb"
+    },
+    {
+      "parameters": {
+        "amount": 1,
+        "unit": "days"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1456,
+        2672
+      ],
+      "id": "ad497627-2a5f-4ef8-88a3-63e0ab0abc79",
+      "name": "Wait For Day 9",
+      "webhookId": "e6c4ec08-4bfe-4da1-8dbd-ea04e64a57f2"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "contactId": "={{ $json.body.contact_id }}",
+        "requestOptions": {}
+      },
+      "id": "6f61ba28-3b7b-4566-810f-454ea9086223",
+      "name": "Get Contact Day 9",
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        752,
+        2944
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "Everything you get with PreSold Leads AI™",
+        "emailType": "text",
+        "message": "=Hey {{ $json.firstName }},\n\nFrom GHL setup to AI follow-up, ads, and booking flows — here's what's included in your system:\n\n✅ Automated workflows\n✅ Smart follow-ups\n✅ High-converting booking flows\n\nSee it live: {{ $json['booking link'] }}\n\n— Ting",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1200,
+        2944
+      ],
+      "id": "a7669b0e-3b12-4d72-b658-21eb3db2c30d",
+      "name": "Send Email Day 9",
+      "webhookId": "af3c98dc-60d4-485e-9692-29b5201c5431"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "contactId": "={{ $json.body.contact_id }}",
+        "requestOptions": {}
+      },
+      "id": "b1fa8bd1-a3f2-48fb-aa3b-57132d779008",
+      "name": "Get Contact Day 10",
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        800,
+        3264
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "Got questions? We've got answers",
+        "emailType": "text",
+        "message": "Hi {{ $json.firstName }},\n\nLeads often ask: \"How will this fit my workflow?\" PreSold Leads AI™ is flexible, personalized, and simple to use.\n\nLet's clarify for you: {{ $json['booking link'] }}\n\n— Ting",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1232,
+        3248
+      ],
+      "id": "81c956ef-687c-4854-a012-2e9fd97e50ee",
+      "name": "Send Email Day 10",
+      "webhookId": "ab7d91e6-2852-4798-a7b2-658ec1d4e653"
+    },
+    {
+      "parameters": {
+        "amount": 1,
+        "unit": "days"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1440,
+        3248
+      ],
+      "id": "4592bc0d-97f3-4bf7-86c2-f083163ede96",
+      "name": "Wait Day 11",
+      "webhookId": "b895c24a-2598-44ff-8f5a-0144e71224a2"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "contactId": "={{ $json.body.contact_id }}",
+        "requestOptions": {}
+      },
+      "id": "75ab1de8-a850-4829-a436-b8d421eab295",
+      "name": "Get Contact Day 11",
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        784,
+        3584
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "How others booked consistent calls",
+        "emailType": "text",
+        "message": "Hey {{ $json.firstName }},\n\nOur clients consistently see booked calls increase, even with minimal posting. Here's another story:\n\n\"Finally, predictable leads without the chaos.\"\n\nBe next: {{ $json['booking link'] }}\n\n— Ting",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1264,
+        3520
+      ],
+      "id": "67d95a4b-4c37-47f8-b290-cc9b554c9071",
+      "name": "Send Email Day 11",
+      "webhookId": "8299ba33-6a51-47e0-91f7-24ee48534f39"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.body.tags && ($json.body.tags.includes('booked') || $json.body.tags.includes('booking-form-submitted')) }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "83784a21-5f2b-4658-8d49-b27c80c99a5b",
+      "name": "Check If Booked Day 14",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        976,
+        2944
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.body.tags && ($json.body.tags.includes('booked') || $json.body.tags.includes('booking-form-submitted')) }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "2fd81d25-ab78-4db5-a7b8-78a6a0cdb746",
+      "name": "Check If Booked Day 15",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1008,
+        3248
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.body.tags && ($json.body.tags.includes('booked') || $json.body.tags.includes('booking-form-submitted')) }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "1f01c423-4d52-4b50-a3a0-900003969d3e",
+      "name": "Check If Booked Day 16",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        3520
+      ]
+    },
+    {
+      "parameters": {
+        "amount": 1,
+        "unit": "days"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1408,
+        2944
+      ],
+      "id": "a988feaf-4d83-4b4b-b772-e4bd8cd7c4bc",
+      "name": "Wait For Day 10",
+      "webhookId": "80add568-353c-440e-bd1d-61608e2ae411"
+    },
+    {
+      "parameters": {
+        "amount": 1,
+        "unit": "days"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1488,
+        3520
+      ],
+      "id": "f7aab0d9-efea-4a78-bfba-4f839ca403b4",
+      "name": "Wait For Day 12",
+      "webhookId": "e6c4ec08-4bfe-4da1-8dbd-ea04e64a57f2"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "contactId": "={{ $json.body.contact_id }}",
+        "requestOptions": {}
+      },
+      "id": "84565448-e8d9-4518-ac68-53cbb971e3ef",
+      "name": "Get Contact Day 12",
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        848,
+        3760
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "Limited spots available — act now",
+        "emailType": "text",
+        "message": "=Hi {{ $json.firstName }},\n\nWe only take 3 clients per month. Spots are filling fast. Don't wait — secure your strategy session today.\n\nBook now: {{ $json['booking link'] }}\n\n— Ting",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1296,
+        3760
+      ],
+      "id": "8885c615-2ab4-454b-b0f8-d952b7bc46bc",
+      "name": "Send Email Day 12",
+      "webhookId": "ae62e34f-ee1a-44e4-829b-8e55c682160f"
+    },
+    {
+      "parameters": {
+        "amount": 1,
+        "unit": "days"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1536,
+        3760
+      ],
+      "id": "c07ad797-5244-42ae-ae3a-386ef12bfab3",
+      "name": "Wait Day 13",
+      "webhookId": "7b8e27ff-69b4-448c-920a-db72f369cb5d"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "contactId": "={{ $json.body.contact_id }}",
+        "requestOptions": {}
+      },
+      "id": "c34be1e0-d5a7-4ec7-937f-04108bfa8b70",
+      "name": "Get Contact Day 13",
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        848,
+        3984
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "Your next step to consistent bookings",
+        "emailType": "text",
+        "message": "Hey {{ $json.firstName }},\n\nOver the last two weeks, you've seen how PreSold Leads AI™ can transform your lead flow.\n\nFinal chance to join this month: {{ $json['booking link'] }}\n\n— Ting",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1296,
+        4000
+      ],
+      "id": "43536f9a-60cd-4ca2-bcf4-14e53a0a5edf",
+      "name": "Send Email Day 13",
+      "webhookId": "929226ac-7b99-40d5-9d40-7f1847909745"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.body.tags && ($json.body.tags.includes('booked') || $json.body.tags.includes('booking-form-submitted')) }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "5a03cc53-baa3-4c34-a50d-b032c2352400",
+      "name": "Check If Booked Day 17",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1072,
+        3760
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.body.tags && ($json.body.tags.includes('booked') || $json.body.tags.includes('booking-form-submitted')) }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "ad7d0be8-7f73-4841-9491-7749360e491f",
+      "name": "Check If Booked Day 18",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1072,
+        3984
+      ]
+    }
+  ],
+  "connections": {
+    "Get Contact Day 0": {
+      "main": [
+        [
+          {
+            "node": "Check If Booked Day 0",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check If Booked Day 0": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Send Email Day 0",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email Day 0": {
+      "main": [
+        [
+          {
+            "node": "Wait Day ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Contact Day 1": {
+      "main": [
+        [
+          {
+            "node": "Check If Booked Day 4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email Day 1": {
+      "main": [
+        [
+          {
+            "node": "Wait Day 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait Day 2": {
+      "main": [
+        [
+          {
+            "node": "Get Contact Day 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Contact Day 2": {
+      "main": [
+        [
+          {
+            "node": "Check If Booked Day 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check If Booked Day 2": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Send Email Day 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email Day 2": {
+      "main": [
+        [
+          {
+            "node": "Wait Day 3 ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait Day ": {
+      "main": [
+        [
+          {
+            "node": "Get Contact Day 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check If Booked Day 4": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Send Email Day 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Initialize Sequence1": {
+      "main": [
+        [
+          {
+            "node": "Get Contact Day 0",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tracking Response1": {
+      "main": [
+        [
+          {
+            "node": "Initialize Sequence1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Tracking Response1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Contact Day 3": {
+      "main": [
+        [
+          {
+            "node": "Check If Booked Day 7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email Day 3": {
+      "main": [
+        [
+          {
+            "node": "Wait Day 4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait Day 4": {
+      "main": [
+        [
+          {
+            "node": "Get Contact Day 4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Contact Day 4": {
+      "main": [
+        [
+          {
+            "node": "Check If Booked Day 9",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email Day 4": {
+      "main": [
+        [
+          {
+            "node": "Wait Day 5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait Day 5": {
+      "main": [
+        [
+          {
+            "node": "Get Contact Day 5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Contact Day 5": {
+      "main": [
+        [
+          {
+            "node": "Check If Booked Day 5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check If Booked Day 5": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Send Email Day 5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email Day 5": {
+      "main": [
+        [
+          {
+            "node": "Wait For Day 6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check If Booked Day 7": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Send Email Day 3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check If Booked Day 9": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Send Email Day 4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait Day 3 ": {
+      "main": [
+        [
+          {
+            "node": "Get Contact Day 3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait For Day 6": {
+      "main": [
+        [
+          {
+            "node": "Get Contact Day 6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Contact Day 6": {
+      "main": [
+        [
+          {
+            "node": "Check If Booked Day 11",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email Day 6": {
+      "main": [
+        [
+          {
+            "node": "Wait Day 7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait Day 7": {
+      "main": [
+        [
+          {
+            "node": "Get Contact Day 7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Contact Day 7": {
+      "main": [
+        [
+          {
+            "node": "Check If Booked Day 12",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email Day 7": {
+      "main": [
+        [
+          {
+            "node": "Wait For Day 8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Contact Day 8": {
+      "main": [
+        [
+          {
+            "node": "Check If Booked Day 13",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email Day 8": {
+      "main": [
+        [
+          {
+            "node": "Wait For Day 9",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check If Booked Day 11": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Send Email Day 6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check If Booked Day 12": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Send Email Day 7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check If Booked Day 13": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Send Email Day 8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait For Day 8": {
+      "main": [
+        [
+          {
+            "node": "Get Contact Day 8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Contact Day 9": {
+      "main": [
+        [
+          {
+            "node": "Check If Booked Day 14",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email Day 9": {
+      "main": [
+        [
+          {
+            "node": "Wait For Day 10",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Contact Day 10": {
+      "main": [
+        [
+          {
+            "node": "Check If Booked Day 15",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email Day 10": {
+      "main": [
+        [
+          {
+            "node": "Wait Day 11",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait Day 11": {
+      "main": [
+        [
+          {
+            "node": "Get Contact Day 11",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Contact Day 11": {
+      "main": [
+        [
+          {
+            "node": "Check If Booked Day 16",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email Day 11": {
+      "main": [
+        [
+          {
+            "node": "Wait For Day 12",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check If Booked Day 14": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Send Email Day 9",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check If Booked Day 15": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Send Email Day 10",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check If Booked Day 16": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Send Email Day 11",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait For Day 10": {
+      "main": [
+        [
+          {
+            "node": "Get Contact Day 10",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait For Day 12": {
+      "main": [
+        [
+          {
+            "node": "Get Contact Day 12",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Contact Day 12": {
+      "main": [
+        [
+          {
+            "node": "Check If Booked Day 17",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email Day 12": {
+      "main": [
+        [
+          {
+            "node": "Wait Day 13",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait Day 13": {
+      "main": [
+        [
+          {
+            "node": "Get Contact Day 13",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Contact Day 13": {
+      "main": [
+        [
+          {
+            "node": "Check If Booked Day 18",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check If Booked Day 17": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Send Email Day 12",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check If Booked Day 18": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Send Email Day 13",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "1a6100b2e52ae3c290d86af3a0507cd2e67a0cc99a26544ed00345df21ae1dd0"
+  }
+}
