@@ -1,0 +1,531 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Workflow: VSL Tracking & Booking Detection\n\n- Tracks video engagement and progress  \n- Triggers workflow to add **vsl-started** tag when VSL is started  \n- Triggers workflow to add **popup-showed** tag when popup is shown  \n- Triggers both email and phone follow-up sequences if no booking\n",
+        "height": 896,
+        "width": 2208
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "5f52b4a0-c78e-43cf-88c2-374c87726b86",
+      "name": "Sticky Note5",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://billu2323.app.n8n.cloud/webhook/start-elevenlab.io-sequence",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "contact_id",
+              "value": "={{ $json.id }}"
+            },
+            {
+              "name": "firstName",
+              "value": "={{ $json.firstName }}"
+            },
+            {
+              "name": "source",
+              "value": "={{ $json.tags[1] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "cc9ce95a-5050-45a3-893b-0369520a7afe",
+      "name": "Trigger ElevenLab Sequence1",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        1872,
+        240
+      ],
+      "notes": "Starts Workflow A.3 (14-day ElevenLab follow-up) for non-booked leads"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "contactId": "={{ $json.id }}",
+        "updateFields": {
+          "tags": "={{ $json.tags.concat(['not-booked']) }}"
+        },
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        1664,
+        256
+      ],
+      "id": "51c0f0ea-b02b-404f-b196-9b09130187c7",
+      "name": "Update a contact3"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "contactId": "={{ $json.id }}",
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        1488,
+        256
+      ],
+      "id": "b43d34b8-2272-45d4-8d23-ce26a99f9307",
+      "name": "Get a contact5"
+    },
+    {
+      "parameters": {
+        "amount": 10,
+        "unit": "seconds"
+      },
+      "id": "810320a0-5ce8-415f-8cf8-91ffb07323de",
+      "name": "Wait 3 Minutes",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [
+        832,
+        240
+      ],
+      "webhookId": "06fa69b4-3837-4535-9e9e-f3962e93109d",
+      "notes": "Waits 3 minutes from initial VSL tracking to check if booking occurred"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"status\": \"success\", \"message\": \"VSL tracking initialized\" } }}",
+        "options": {}
+      },
+      "id": "77342ab8-b2e0-485f-a1dd-b9ef3414a4e7",
+      "name": "Tracking Response2",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        368,
+        240
+      ],
+      "notes": "Returns success response for VSL tracking initialization"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.tags }}",
+              "operation": "contains",
+              "value2": "booking-form-submitted"
+            }
+          ]
+        }
+      },
+      "id": "dcdf1972-22be-4d68-a4d8-8a85b4f11109",
+      "name": "Check Booking Status",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        1280,
+        240
+      ],
+      "notes": "Checks if booking-form-submitted tag exists - if yes, end workflow"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "contactId": "={{ $json.body.contact_id }}",
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        1056,
+        240
+      ],
+      "id": "5155edda-ef36-4ca2-84ca-27074e9e85f0",
+      "name": "Get a contact7"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "vsl-tracking",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "3854222c-7055-4c66-9825-29a95adba6fe",
+      "name": "VSL Tracking Webhook1",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        144,
+        240
+      ],
+      "webhookId": "82edce54-cd4b-4670-a753-2fca5ce08f68",
+      "notes": "Receives VSL tracking data from workflows A.1(a) and A.1(b)"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "vsl-started",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "31afebeb-b926-449b-b56a-07f35b43f6f0",
+      "name": "VSL Started Webhook1",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        144,
+        464
+      ],
+      "webhookId": "bfb71f02-0819-4ffe-bc80-8765716ae20e",
+      "notes": "Triggered when user actually starts watching the VSL video"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "vsl-progress",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "4c0e9b03-379c-4e8d-a529-8420510a01e2",
+      "name": "VSL Progress Webhook1",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        128,
+        720
+      ],
+      "webhookId": "fa84a0f8-ab39-48ab-90db-ff41374210e9",
+      "notes": "Tracks video progress in real-time, triggered every few seconds"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"status\": \"success\", \"message\": \"VSL started tracked\" } }}",
+        "options": {}
+      },
+      "id": "a4d95acd-3986-4567-9d11-8699c1adb8d9",
+      "name": "Started Response1",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        1088,
+        480
+      ],
+      "notes": "Returns response when VSL video starts"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "id": "ba4710fd-29f0-49d3-8390-e727dc41795f",
+      "name": "Popup Response1",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        656
+      ],
+      "notes": "Returns popup data to frontend when 45-second mark is reached"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "contactId": "={{ $('Code5').item.json.contact_id }}",
+        "updateFields": {
+          "tags": "={{ $json.tags.concat(['vsl-started']) }}"
+        },
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        832,
+        464
+      ],
+      "id": "9f1e5a44-640a-4f5a-bc65-a4dc3d99fa8d",
+      "name": "Update a contact4"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "contactId": "={{ $('Code4').item.json.contact_id }}",
+        "updateFields": {
+          "tags": "={{ $json.tags.concat(['pop up showed']) }}"
+        },
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        848,
+        672
+      ],
+      "id": "4fb29154-ec47-422c-81f9-e0b8e0e66f44",
+      "name": "Update a contact5"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "contactId": "={{ $json.contact_id }}",
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        624,
+        464
+      ],
+      "id": "76198398-5473-4f3c-9967-546e96fcf847",
+      "name": "Get a contact9"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "contactId": "={{ $json.contact_id }}",
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        624,
+        720
+      ],
+      "id": "b7caa2a1-05d2-4b53-9659-c869a28573b1",
+      "name": "Get a contact11"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = JSON.parse($json.body);\nreturn { contact_id: body.contact_id };\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        368,
+        720
+      ],
+      "id": "f72a1709-1774-4a1c-8783-7642a9f7b22a",
+      "name": "Code4"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = JSON.parse($json.body);\nreturn { contact_id: body.contact_id };\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        384,
+        464
+      ],
+      "id": "9aa35d33-3a19-4c2a-a02c-ee1738c626a5",
+      "name": "Code5"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://yellowrockhouse.app.n8n.cloud/webhook-test/email-nurturizing",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        576,
+        240
+      ],
+      "id": "6e7e591d-2d04-48fa-8399-dcc93b548a87",
+      "name": "Email Nurturizing"
+    }
+  ],
+  "connections": {
+    "Update a contact3": {
+      "main": [
+        [
+          {
+            "node": "Trigger ElevenLab Sequence1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a contact5": {
+      "main": [
+        [
+          {
+            "node": "Update a contact3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 3 Minutes": {
+      "main": [
+        [
+          {
+            "node": "Get a contact7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tracking Response2": {
+      "main": [
+        [
+          {
+            "node": "Email Nurturizing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Booking Status": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Get a contact5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a contact7": {
+      "main": [
+        [
+          {
+            "node": "Check Booking Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "VSL Tracking Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Tracking Response2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "VSL Started Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Code5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "VSL Progress Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Code4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a contact4": {
+      "main": [
+        [
+          {
+            "node": "Started Response1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a contact5": {
+      "main": [
+        [
+          {
+            "node": "Popup Response1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a contact9": {
+      "main": [
+        [
+          {
+            "node": "Update a contact4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a contact11": {
+      "main": [
+        [
+          {
+            "node": "Update a contact5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code4": {
+      "main": [
+        [
+          {
+            "node": "Get a contact11",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code5": {
+      "main": [
+        [
+          {
+            "node": "Get a contact9",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Nurturizing": {
+      "main": [
+        [
+          {
+            "node": "Wait 3 Minutes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "1a6100b2e52ae3c290d86af3a0507cd2e67a0cc99a26544ed00345df21ae1dd0"
+  }
+}
