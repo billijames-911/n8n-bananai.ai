@@ -1,0 +1,793 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "booking-confirmed",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "86185a68-353d-4a8d-bbee-774d8342e6b8",
+      "name": "Booking Confirmed Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        96,
+        304
+      ],
+      "webhookId": "d48ad7d9-0040-4baa-89c4-21ad945e607e",
+      "notes": "Triggered when booking form is submitted from VSL or other sources"
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "contact_id",
+              "value": "={{ $('Booking Confirmed Webhook').item.json.body.contact_id }}"
+            },
+            {
+              "name": "appointment_date",
+              "value": "={{ $json.booking_date }}"
+            },
+            {
+              "name": "appointment_time",
+              "value": "={{ $json.booking_time }}"
+            },
+            {
+              "name": "booking_timestamp",
+              "value": "={{ new Date().toISOString() }}"
+            },
+            {
+              "name": "First name",
+              "value": "={{ $json.firstName }}"
+            },
+            {
+              "name": "Last name",
+              "value": "={{ $json.lastName }}"
+            },
+            {
+              "name": "Email",
+              "value": "={{ $json.email }}"
+            },
+            {
+              "name": "Phone",
+              "value": "={{ $json.phone }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "90edd888-908d-403c-a2d5-3065c41b10f0",
+      "name": "Extract Booking Details",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        496,
+        304
+      ],
+      "notes": "Extracts and formats booking details from webhook data"
+    },
+    {
+      "parameters": {
+        "amount": 0,
+        "unit": "seconds"
+      },
+      "id": "30eb3b34-e0d0-4f62-9e75-c754207b29ae",
+      "name": "Wait 5 Minutes",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [
+        976,
+        304
+      ],
+      "webhookId": "3c9d8421-9b6b-4f66-8d63-e8e8baa9b0eb",
+      "disabled": true,
+      "notes": "Wait 5 minutes before processing booking to allow for any immediate changes"
+    },
+    {
+      "parameters": {
+        "amount": 0,
+        "unit": "seconds"
+      },
+      "id": "7351f3e8-2d09-4ff6-8ed9-f280ab4176a6",
+      "name": "Wait 15 Minutes",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [
+        2272,
+        272
+      ],
+      "webhookId": "ce9af92e-369e-4c00-baff-93a91deeba73",
+      "disabled": true,
+      "notes": "Wait 15 minutes before triggering pre-qualification call"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.success }}",
+              "operation": "contains",
+              "value2": "=false"
+            }
+          ]
+        }
+      },
+      "id": "7a3ae500-5ba9-449e-85d0-03ba24244c34",
+      "name": "Check Call Outcome",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        336,
+        896
+      ],
+      "disabled": true,
+      "notes": "Checks if pre-qualification call was answered or went to voicemail"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "43bc31b2-09e5-44dd-91da-5ad150c9205c",
+      "name": "Retry Call Loop",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1712,
+        912
+      ],
+      "disabled": true,
+      "notes": "Sets up loop for retry attempts every 12 hours"
+    },
+    {
+      "parameters": {
+        "amount": 12
+      },
+      "id": "431a2303-73fc-4e68-9b85-f853e8581f2d",
+      "name": "Wait 12 Hours",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [
+        1472,
+        912
+      ],
+      "webhookId": "2e39666f-4f81-46ae-9a5c-422600d73352",
+      "disabled": true,
+      "notes": "Wait 12 hours before retry attempt"
+    },
+    {
+      "parameters": {
+        "content": "## Booking Confirmed",
+        "height": 1152,
+        "width": 2720,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "67ec4baa-4cba-45f2-94cd-22c4be98a8cc",
+      "name": "Sticky Note1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const outputItems = [];\n\nfor (const item of $input.all()) {\n  const body = item.json.body || {};\n  const calendar = body.calendar || {};\n\n  // Create a new item to hold the extracted data\n  const newItem = {\n    json: {\n      name: body.full_name || body.first_name || calendar.title || \"\",\n      firstName: body.first_name || \"\",\n      lastName: body.last_name || \"\",\n      email: body.email || \"\",\n      phone: body.phone || \"\",\n      contact_id: body.contact_id || \"\",\n      booking_date: calendar.startTime ? calendar.startTime.split(\"T\")[0] : \"\",\n      booking_time: calendar.startTime ? calendar.startTime.split(\"T\")[1].substring(0, 5) : \"\"\n    }\n  };\n\n  outputItems.push(newItem);\n}\n\nreturn outputItems;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        272,
+        304
+      ],
+      "id": "2ca04398-914c-444a-8a32-a701ba878d1f",
+      "name": "Code3"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "contactId": "={{ $json.id }}",
+        "updateFields": {
+          "tags": "={{ $json.tags.concat(['booked']) }}"
+        },
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        1360,
+        304
+      ],
+      "id": "2ba11532-5ae2-42d5-a95a-8aa07bfbd2e1",
+      "name": "Update a contact6",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "contactId": "={{ $json.body.contact_id }}",
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        1168,
+        304
+      ],
+      "id": "9f31a39f-ccf5-4e69-9958-ee6cdae5a255",
+      "name": "Get a contact8",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "sendTo": "bilalbinejazdeen@gmail.com",
+        "subject": "New Appointment is Booked",
+        "emailType": "text",
+        "message": "=Hi Team,\n\nA new lead has booked an appointment via email. Here are the details:\n\nFull Name: {{ $json.firstName }}\n\nEmail: {{ $json.email }}\n\nPhone: {{ $json.phone }}\n\nDate Booked: {{ $('Code3').item.json.booking_date }}\n\n\nPlease follow up accordingly.\n\nBest regards,",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1568,
+        304
+      ],
+      "id": "8e18c2ae-d92e-4e47-aff5-2597b64093cc",
+      "name": "Send a team message",
+      "webhookId": "61e1e9a8-296c-4124-a2b0-7a8a55f71012",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.elevenlabs.io/v1/convai/twilio/outbound-call",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "xi-api-key",
+              "value": "sk_0cdd49f4684245deb7c93384eb387b2c1dfdb059c89f84d6"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "agent_id",
+              "value": "agent_9801k2q2qyfzebwsw3rfy0bm3gn6"
+            },
+            {
+              "name": "agent_phone_number_id",
+              "value": "phnum_9301k1qya4m1fq1b5xrxe14fxgkc"
+            },
+            {
+              "name": "to_number",
+              "value": "+966576908563"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2560,
+        400
+      ],
+      "id": "ae3ce8cf-3702-4512-b22a-54fa22f32437",
+      "name": "HTTP Request2",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "from": "+13135130534",
+        "to": "+18777804236",
+        "message": "=> Hey {{contact.first_name}}, it’s Ting from Yellow Rock House 👋\n> \n> \n> You’re all set for your PreSold Leads AI™ call! I’ll send you the link + reminders closer to the time. Looking forward to it.\n>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        2000,
+        288
+      ],
+      "id": "eb866e7d-5db2-4521-9f59-8127bdde308a",
+      "name": "Send an SMS/MMS/WhatsApp message2",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "from": "+13135130534",
+        "to": "+18777804236",
+        "message": "=Hey {{contact.first_name}}, it’s Ting from Yellow Rock House 👋\n\nJust tried to reach you to confirm your PreSold Leads AI™ session.\n\nI’ll send over a quick pre-call form — just 3–5 questions to help us get the most out of the time.\n\nIf you’re still in, just text back “confirm” and I’ll keep your spot locked.\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        912
+      ],
+      "id": "6597b5de-bc14-4d9d-b605-8f015fa2fb0f",
+      "name": "Send an SMS/MMS/WhatsApp message4",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "sendTo": "bilalbinejazdeen@gmail.com",
+        "subject": "You’re booked — here’s what we’ll cover",
+        "emailType": "text",
+        "message": "=Hi {{contact.first_name}},\n\nThanks for booking your **PreSold Leads AI™ Strategy Call**. Here’s what to expect:\n\n🧠 **Clarity**: I’ll ask a few focused questions to understand your offer, goals, and current bottlenecks.\n\n📈 **System walkthrough**: You’ll get a live look at how we build smart, AI-powered booking systems — and what it could look like in your business.\n\n💬 **No pitch, no pressure**: Just a conversation to see if it’s the right fit. You’ll walk away clearer either way.\n\n**What happens next:**\n\n1. Keep an eye on your inbox — I’ll be sending you a few insights to prep for our chat\n2. I may send a short voice message or SMS reminder before the call\n\nLooking forward to connecting,\n\n— Ting\n\nFounder, Yellow Rock House\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1760,
+        288
+      ],
+      "id": "d05f2fee-6d60-4ae8-8edf-9ef2703d0e0f",
+      "name": "Send a message to booked lead",
+      "webhookId": "61e1e9a8-296c-4124-a2b0-7a8a55f71012",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "68b92b4c-3227-452a-889d-5b66ef59fe9c",
+              "name": "Name",
+              "value": "Bilal",
+              "type": "string"
+            },
+            {
+              "id": "99726aa9-fae7-4b9f-aa29-3f5c913daa20",
+              "name": "Phone",
+              "value": "+966576908563",
+              "type": "string"
+            },
+            {
+              "id": "229a07d4-981a-4dc2-83eb-0b3ed761b83d",
+              "name": "Voicemail",
+              "value": "pre-call-vm",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        720,
+        912
+      ],
+      "id": "908fe3a5-63e1-45a1-a453-ff717914f01e",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://services.leadconnectorhq.com/hooks/6YFcDHnhN2DTQoFcYZF3/webhook-trigger/50125141-a71b-45db-95e7-ab8334585df7",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "=Name",
+              "value": "={{ $json.Name }}"
+            },
+            {
+              "name": "Phone",
+              "value": "={{ $json.Phone }}"
+            },
+            {
+              "name": "Voicemail",
+              "value": "={{ $json.Voicemail }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        976,
+        912
+      ],
+      "id": "9c7c21ad-d1d0-4245-a5f4-4b11b0515783",
+      "name": "HTTP Request Fpr VM 1 Day 0"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        736,
+        304
+      ],
+      "id": "14bed535-79f1-4ed1-b040-14700254cb56",
+      "name": "Append or update row in booked sheet"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        128,
+        912
+      ],
+      "id": "b462d794-748b-4e4e-a8b1-ba12d6a3105e",
+      "name": "Get row(s) in sheet",
+      "disabled": true
+    }
+  ],
+  "connections": {
+    "Booking Confirmed Webhook": {
+      "main": [
+        [
+          {
+            "node": "Code3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Booking Details": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in booked sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 5 Minutes": {
+      "main": [
+        [
+          {
+            "node": "Get a contact8",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 15 Minutes": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Call Outcome": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retry Call Loop": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 12 Hours": {
+      "main": [
+        [
+          {
+            "node": "Retry Call Loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code3": {
+      "main": [
+        [
+          {
+            "node": "Extract Booking Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a contact6": {
+      "main": [
+        [
+          {
+            "node": "Send a team message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a contact8": {
+      "main": [
+        [
+          {
+            "node": "Update a contact6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a team message": {
+      "main": [
+        [
+          {
+            "node": "Send a message to booked lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request2": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send an SMS/MMS/WhatsApp message2": {
+      "main": [
+        [
+          {
+            "node": "Wait 15 Minutes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send an SMS/MMS/WhatsApp message4": {
+      "main": [
+        [
+          {
+            "node": "Wait 12 Hours",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message to booked lead": {
+      "main": [
+        [
+          {
+            "node": "Send an SMS/MMS/WhatsApp message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request Fpr VM 1 Day 0",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request Fpr VM 1 Day 0": {
+      "main": [
+        [
+          {
+            "node": "Send an SMS/MMS/WhatsApp message4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append or update row in booked sheet": {
+      "main": [
+        [
+          {
+            "node": "Wait 5 Minutes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Check Call Outcome",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {
+    "Booking Confirmed Webhook": [
+      {
+        "headers": {
+          "host": "yellowrockhouse.app.n8n.cloud",
+          "user-agent": "axios/1.7.7",
+          "content-length": "2226",
+          "accept": "application/json, text/plain, */*",
+          "accept-encoding": "gzip, br",
+          "cdn-loop": "cloudflare; loops=1; subreqs=1",
+          "cf-connecting-ip": "35.192.54.113",
+          "cf-ew-via": "15",
+          "cf-ipcountry": "US",
+          "cf-ray": "97d9884523fb9126-ORD",
+          "cf-visitor": "{\"scheme\":\"https\"}",
+          "cf-worker": "n8n.cloud",
+          "content-type": "application/json",
+          "traceparent": "00-a2c34a4497a349a8a5434520036ac463-f4648e74d80c7411-00",
+          "x-forwarded-for": "35.192.54.113, 108.162.216.17",
+          "x-forwarded-host": "yellowrockhouse.app.n8n.cloud",
+          "x-forwarded-port": "443",
+          "x-forwarded-proto": "https",
+          "x-forwarded-server": "traefik-prod-users-gwc-13-6db466c7ff-ms98z",
+          "x-is-trusted": "yes",
+          "x-real-ip": "35.192.54.113"
+        },
+        "params": {},
+        "query": {},
+        "body": {
+          "utm_source": "Organic",
+          "utm_medium": "",
+          "Business Name": "VitalCare",
+          "Sales Rep": "Ting",
+          "contact_id": "41zAmWMqvFwZ8VVaEfG9",
+          "first_name": "Muhammad",
+          "last_name": "Ejaz",
+          "full_name": "Muhammad Ejaz",
+          "email": "numanejazdeen@gmail.com",
+          "phone": "+966576908563",
+          "tags": "appointment booked,voicemail_day_1_2_answered,voicemail_day_0_2,appointment_booked",
+          "country": "US",
+          "timezone": "Asia/Riyadh",
+          "date_created": "2025-09-04T11:04:49.074Z",
+          "contact_source": "opt-in form",
+          "full_address": "",
+          "contact_type": "lead",
+          "location": {
+            "name": "Yellow Rock House",
+            "address": "3400 Cottage Way, Ste G2 #21593",
+            "city": "Sacramento",
+            "state": "California",
+            "country": "US",
+            "postalCode": "95825",
+            "fullAddress": "3400 Cottage Way, Ste G2 #21593, Sacramento California 95825",
+            "id": "6YFcDHnhN2DTQoFcYZF3"
+          },
+          "user": {
+            "firstName": "Ting",
+            "lastName": "Feng",
+            "email": "ting@yellowrockhouse.com"
+          },
+          "calendar": {
+            "title": "Muhammad Ejaz",
+            "selectedTimezone": "America/Los_Angeles",
+            "appointmentId": "aMx195qOt6ir9Wz2mEc2",
+            "startTime": "2025-09-15T08:00:00",
+            "endTime": "2025-09-15T08:30:00",
+            "status": "booked",
+            "appoinmentStatus": "confirmed",
+            "address": "",
+            "notes": "hi",
+            "date_created": "2025-09-11T19:22:08.383Z",
+            "created_by": "",
+            "created_by_user_id": null,
+            "created_by_meta": {
+              "source": "booking_widget"
+            },
+            "last_updated_by_meta": {
+              "source": "booking_widget"
+            },
+            "id": "qV7G4qEz3YFniLCKZGid",
+            "calendarName": "Appointment Booking"
+          },
+          "workflow": {
+            "id": "614c2ab4-53c8-4ccf-b876-a3a7edfbb29c",
+            "name": "24 hour before Workflow"
+          },
+          "triggerData": {},
+          "contact": {
+            "attributionSource": {
+              "sessionSource": "CRM UI",
+              "medium": "manual",
+              "mediumId": null
+            },
+            "lastAttributionSource": {
+              "sessionSource": "Direct traffic",
+              "url": "https://api.leadconnectorhq.com/widget/bookings/appointment-booking-page-source",
+              "utmSource": null,
+              "utmMedium": null,
+              "utmContent": null,
+              "utmTerm": null,
+              "utmKeyword": null,
+              "utmMatchtype": null,
+              "referrer": null,
+              "gclid": null,
+              "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36",
+              "ip": "2001:16a2:cb97:f00:9849:6c10:dcc6:2ce5",
+              "gaClientId": "GA1.2.248908190.1756932204",
+              "gaSessionId": null,
+              "medium": "calendar",
+              "mediumId": "qV7G4qEz3YFniLCKZGid",
+              "adName": null,
+              "adGroupId": null,
+              "adId": null,
+              "gbraid": null,
+              "wbraid": null
+            }
+          },
+          "attributionSource": {},
+          "customData": {}
+        },
+        "webhookUrl": "https://yellowrockhouse.app.n8n.cloud/webhook-test/booking-confirmed",
+        "executionMode": "test"
+      }
+    ]
+  },
+  "meta": {
+    "instanceId": "1a6100b2e52ae3c290d86af3a0507cd2e67a0cc99a26544ed00345df21ae1dd0"
+  }
+}
