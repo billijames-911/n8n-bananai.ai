@@ -1,0 +1,405 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "next-day-8",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -1056,
+        176
+      ],
+      "id": "7ae0d717-01e1-41f4-a282-d3fc9ad27c28",
+      "name": "Webhook",
+      "webhookId": "25f9bc34-b20b-42c9-bedb-9e02e72ec3ce"
+    },
+    {
+      "parameters": {
+        "amount": 24,
+        "unit": "={{ $now.plus({ days: 1 }).set({ hour: 19, minute: 0, second: 0, millisecond: 0 }).toISO() }}\n_"
+      },
+      "id": "df538081-04e6-43ec-944f-d872aa655094",
+      "name": "Wait 24 Hours Day ",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [
+        -832,
+        176
+      ],
+      "webhookId": "4ad6f61c-743a-4d05-8066-806038ff1c02",
+      "notes": "Wait 24 hours for Day 1 sequence"
+    },
+    {
+      "parameters": {
+        "unit": "minutes"
+      },
+      "id": "c3e7c9ee-2875-4a75-a103-0c598224a05e",
+      "name": "Wait 1 Minute",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1,
+      "position": [
+        -192,
+        224
+      ],
+      "webhookId": "203a8dd6-e8c1-4d7b-980f-d29471784447",
+      "notes": "Day 0: Wait 1 minute after sequence initialization"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.tags && ($json.tags.includes('booked') || $json.tags.includes('booking-form-submitted')) }}",
+              "value2": true
+            }
+          ]
+        }
+      },
+      "id": "0ef1ec86-7eca-41c7-a400-b75b50178641",
+      "name": "Check If Booked Day 0",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        464,
+        208
+      ],
+      "notes": "If booked, end workflow immediately"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        160,
+        208
+      ],
+      "id": "bb84b21c-c3c4-4547-888c-bc48ae3cf385",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "contact_id",
+              "value": "=4b6pAJRlE7IH539DZZBq"
+            },
+            {
+              "name": "firstName",
+              "value": "={{ $json.body.first_name }}"
+            },
+            {
+              "name": "phone",
+              "value": "={{ $json.body.phone }}"
+            },
+            {
+              "name": "sequence_day",
+              "value": "0"
+            },
+            {
+              "name": "booking_link",
+              "value": "https://bit.ly/3A51SCONNECT"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "8f32df35-fe8f-446b-b586-9baeea97cd27",
+      "name": "Format Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        -416,
+        224
+      ],
+      "notes": "Initialize tracking variables for 14-day AI call sequence"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "contactId": "=41zAmWMqvFwZ8VVaEfG9",
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "338a258e-8f92-4899-9f7f-cdce83da2994",
+      "name": "Get a contact If they booked"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "191W_RrLTYDOM8bgXodL5hpyiusJ7vlTHPOVYFKzEOOk",
+          "mode": "list",
+          "cachedResultName": "Data Base of lead",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/191W_RrLTYDOM8bgXodL5hpyiusJ7vlTHPOVYFKzEOOk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/191W_RrLTYDOM8bgXodL5hpyiusJ7vlTHPOVYFKzEOOk/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Follow up day": "Day 2",
+            "Contact ID": "={{ $json.id }}"
+          },
+          "matchingColumns": [
+            "Contact ID"
+          ],
+          "schema": [
+            {
+              "id": "Contact ID",
+              "displayName": "Contact ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Clinic Name",
+              "displayName": "Clinic Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "First Name",
+              "displayName": "First Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Last Name",
+              "displayName": "Last Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Time spam",
+              "displayName": "Time spam",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Source",
+              "displayName": "Source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Follow up day",
+              "displayName": "Follow up day",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        784,
+        224
+      ],
+      "id": "9b335d01-c8f7-4974-9636-aafaf34c43a0",
+      "name": "Add the follow up day 0 in column"
+    },
+    {
+      "parameters": {
+        "message": "=Are we being a nuisance? Just want to make sure everything’s okay.\nI don’t mean to pry, but I hope you’ve had a chance to access our course and community—both are designed to help you attract new clients without the overwhelm.\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        1104,
+        240
+      ],
+      "id": "6d7c3240-1c7e-4a0a-ad7c-688efe993516",
+      "name": "Send an SMS/MMS/WhatsApp message"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://yellowrockhouse.app.n8n.cloud/webhook-test/next-day-7",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1312,
+        240
+      ],
+      "id": "013e1529-d30c-409e-9f2c-cb1f74eb95b2",
+      "name": "HTTP Request for day 7"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Wait 24 Hours Day ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 24 Hours Day ": {
+      "main": [
+        [
+          {
+            "node": "Format Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait 1 Minute": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "Get a contact If they booked",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check If Booked Day 0": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Add the follow up day 0 in column",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Check If Booked Day 0",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Data": {
+      "main": [
+        [
+          {
+            "node": "Wait 1 Minute",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a contact If they booked": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add the follow up day 0 in column": {
+      "main": [
+        [
+          {
+            "node": "Send an SMS/MMS/WhatsApp message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send an SMS/MMS/WhatsApp message": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request for day 7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "1a6100b2e52ae3c290d86af3a0507cd2e67a0cc99a26544ed00345df21ae1dd0"
+  }
+}
