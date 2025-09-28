@@ -1,0 +1,419 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "amount": 1,
+        "unit": "days"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1552,
+        208
+      ],
+      "id": "33f05c9b-3976-462a-9d59-6964cef7363a",
+      "name": "Wait Day 1",
+      "webhookId": "afef5556-d463-4059-82c2-008558dba6ec"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "Most founders stay stuck here. You don’t have to.",
+        "emailType": "text",
+        "message": "=Hey {{first_name}},\n\nYou’re smart. You’ve got something valuable. But here’s what I see all the time:\n\n→ 10/10 delivery. 3/10 systems.\n\nThe result? Feast one month, famine the next.\n\nThat’s why I built PreSold Leads AI™.\n\nIt quietly handles what most founders avoid:\n✅ Capturing attention with one clear video\n✅ Following up with precision (no manual DMs)\n✅ Filling your calendar with real buyers — not time-wasters\n\nYou don’t need more leads.\nYou need a system that sells for you, while you focus on doing what you’re actually good at.\n\nThat’s what we’ll cover on our call.\n\n— Ting",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        960,
+        480
+      ],
+      "id": "9875732b-d9be-4af0-ba71-32037fd42d64",
+      "name": "Send Email 2",
+      "webhookId": "d0106b9f-9a08-4c9f-9181-4730337d881c"
+    },
+    {
+      "parameters": {
+        "amount": 2,
+        "unit": "days"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1568,
+        480
+      ],
+      "id": "c6637eee-943e-47b8-a077-83d2c7093971",
+      "name": "Wait Day 3",
+      "webhookId": "aae9bc94-6c9a-4eb4-a094-55ab09b65930"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "You don’t need to post more. You need this.",
+        "emailType": "text",
+        "message": "={{first_name}},\n\nIf you’ve been told to “just post more” — here’s the truth:\n\nMore content doesn’t mean more clients.\n\nPosting without a system behind it = shouting into the void.\n\nWith PreSold Leads AI™, you can:\n✅ Post once — and still convert daily\n✅ Automate follow-up across SMS, email, voicemail\n✅ Pre-qualify and book real sales calls (on autopilot)\n\nOne of our clients said it best:\n“This made me visible and predictable. I don’t wake up anxious anymore.”\n\nWe’ll walk through exactly how it works on your strategy call.\n\nNo pitch. Just clarity.\n\n— Ting",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        960,
+        768
+      ],
+      "id": "23bbd7b9-af1c-47ad-bf11-1c4d37e10aed",
+      "name": "Send Email 3",
+      "webhookId": "ddd15d0e-19da-492f-8ef3-7d2a1d9e2588"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "Why we only take 3 clients per month",
+        "emailType": "text",
+        "message": "=Hey {{first_name}},\n\nA quick heads-up:\n\nWe only take on 3 new clients per month.\n\nNot because we can’t handle more — but because we go deep.\n\nWe build your PreSold Leads AI™ inside your brand — with your tone, your goals, and your pace.\n\nNo templates. No pushy sales tactics. Just high-converting clarity.\n\nIf you’re ready to scale in a way that’s clean and calm…\n\nLet’s talk.\n\n— Ting",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        960,
+        1040
+      ],
+      "id": "883854a8-0aec-4d57-9d6b-7ceb5c29e82a",
+      "name": "Send Email 4",
+      "webhookId": "4ed40c19-2979-4dbe-a885-8f71ae3c5c83"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "Don’t let another patient slip away…",
+        "emailType": "text",
+        "message": "Hi {{ $json.firstName }},\n\nOur schedule is filling up fast — we only take 1 clinic per niche/location per week to ensure results.\n\nIf you want booked consults without the stress, now is the time to act. BookedFlow™ is ready to plug into your clinic and start filling your calendar immediately.\n\nCTA: {{ $json['booking link'] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        976,
+        1392
+      ],
+      "id": "a54209f6-3f60-4a0a-9a4e-a02e44a84f32",
+      "name": "Send Email 5",
+      "webhookId": "748ce58c-0ea5-4c5d-a08e-ce0fcf48c460"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "Last call — our Aug client slots are almost gone",
+        "emailType": "text",
+        "message": "=Hey {{first_name}},\n\nJust a gentle reminder: we’re closing July onboarding in a few days.\n\nIf we don’t speak soon, you’ll have to wait for our August cycle.\n\nWe only onboard 3 clients at a time — so we can stay hands-on and make your system actually convert.\n\nIf the time’s right, let’s go.\n\n[Book / Rebook your strategy call]\n\n— Ting",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        992,
+        1632
+      ],
+      "id": "9b0e8cff-5904-467c-817b-a9054820feda",
+      "name": "Send Email 6",
+      "webhookId": "93e03a0d-b7b1-4bf1-a23d-7bd1ab879df0"
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "contact_id",
+              "value": "={{ $json.body.contact_id }}"
+            },
+            {
+              "name": "firstName",
+              "value": "={{ $json.body.firstName }}"
+            },
+            {
+              "name": "email",
+              "value": "={{ $json.body.email }}"
+            },
+            {
+              "name": "booking link",
+              "value": "https://api.leadconnectorhq.com/widget/booking/W8QcIllkRPKyS76yvPEZ"
+            },
+            {
+              "name": "video training",
+              "value": "={{ $json.body['vsl video link'] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "786e817d-8ad1-467b-9e4a-d874a8d486cc",
+      "name": "Initialize Sequence",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        624,
+        208
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"status\": \"success\", \"message\": \"Email Initialized\" } }}",
+        "options": {}
+      },
+      "id": "76c84af2-bb3a-4444-86ea-bd241ec8dbe2",
+      "name": "Tracking Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        448,
+        208
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "You’re in. Let’s keep this simple.",
+        "emailType": "text",
+        "message": "=Hi {{first_name}},\n\nThanks for booking in — you’ll get a lot from this process, whether we work together or not.\n\nPreSold Leads AI™ is different. It’s not a funnel.\n\nIt’s the infrastructure that turns interest into booked calls — without you chasing, spamming, or burning out.\n\nWhat you’ll see:\n✅ A video system that pre-sells your leads\n✅ Smart automations (SMS, email, voicemail) that follow up for you\n✅ Booking flows that feel personal — not pushy\n\nOver the next few emails, I’ll share a few honest lessons about why most systems fail — and how we’ve helped B2B founders get off the feast-and-famine rollercoaster.\n\nTalk soon,\n— Ting\nFounder, Yellow Rock House",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        944,
+        208
+      ],
+      "id": "0a76ce75-f6c7-44a3-82d6-0a6946cc0517",
+      "name": "Send a message Day ",
+      "webhookId": "23e5ad3c-f9bc-4ce1-91ff-d52c10b4682d"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "email-nurturizing",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        240,
+        208
+      ],
+      "id": "237f8d83-1598-460c-b5f4-f65688e84814",
+      "name": "Webhook Email nurture",
+      "webhookId": "59683591-4acd-4609-8c3f-2b337d963fb5"
+    },
+    {
+      "parameters": {
+        "content": "## Email Nurturizing",
+        "height": 1920,
+        "width": 1808
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "6c025954-ae26-4b38-913f-0289e8e74b9b",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "unit": "days"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1568,
+        768
+      ],
+      "id": "b475913c-84d9-408d-b3f5-2605d5e1f8f4",
+      "name": "Wait for 5 Days",
+      "webhookId": "328406f6-7d0b-4cdf-ba8e-72d0be97a28d"
+    },
+    {
+      "parameters": {
+        "amount": 3,
+        "unit": "days"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1600,
+        1392
+      ],
+      "id": "45b45ff3-9b13-4238-961e-24dd964cd977",
+      "name": "Wait for 14 days",
+      "webhookId": "c71fbd70-eec3-471f-a625-1e6679ed26f1"
+    },
+    {
+      "parameters": {
+        "amount": 3,
+        "unit": "days"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1568,
+        1040
+      ],
+      "id": "5b14337a-93e0-4c86-b020-eece0ef1b6e9",
+      "name": "Wait for 12 Days",
+      "webhookId": "cfb855f5-bf1f-4174-bde0-7fe7976eb783"
+    }
+  ],
+  "connections": {
+    "Wait Day 1": {
+      "main": [
+        [
+          {
+            "node": "Send Email 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email 2": {
+      "main": [
+        [
+          {
+            "node": "Wait Day 3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait Day 3": {
+      "main": [
+        [
+          {
+            "node": "Send Email 3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email 3": {
+      "main": [
+        [
+          {
+            "node": "Wait for 5 Days",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email 4": {
+      "main": [
+        [
+          {
+            "node": "Wait for 12 Days",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Email 5": {
+      "main": [
+        [
+          {
+            "node": "Wait for 14 days",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Initialize Sequence": {
+      "main": [
+        [
+          {
+            "node": "Send a message Day ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tracking Response": {
+      "main": [
+        [
+          {
+            "node": "Initialize Sequence",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message Day ": {
+      "main": [
+        [
+          {
+            "node": "Wait Day 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook Email nurture": {
+      "main": [
+        [
+          {
+            "node": "Tracking Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait for 5 Days": {
+      "main": [
+        [
+          {
+            "node": "Send Email 4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait for 14 days": {
+      "main": [
+        [
+          {
+            "node": "Send Email 6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait for 12 Days": {
+      "main": [
+        [
+          {
+            "node": "Send Email 5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "1a6100b2e52ae3c290d86af3a0507cd2e67a0cc99a26544ed00345df21ae1dd0"
+  }
+}
