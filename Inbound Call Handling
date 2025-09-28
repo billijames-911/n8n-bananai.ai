@@ -1,0 +1,1050 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "inbound-call",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "0282db17-6d0b-44ea-abf9-c060be0ee7b1",
+      "name": "Inbound Call Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        -1616,
+        496
+      ],
+      "webhookId": "06c9af11-75b6-4a4d-9af7-02161d143143",
+      "notes": "Triggered by a missed client call to initiate immediate follow-up"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "{{ { \"status\": \"success\", \"message\": \"Callback alert sent\" } }}",
+        "options": {}
+      },
+      "id": "81f39cab-ae62-4db2-b003-240aaccb733a",
+      "name": "Callback Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        336,
+        16
+      ],
+      "notes": "Sends a success response back to the inbound call webhook"
+    },
+    {
+      "parameters": {
+        "content": "## Call Inbound Handler",
+        "height": 1104,
+        "width": 4480,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1792,
+        304
+      ],
+      "typeVersion": 1,
+      "id": "a7b0a147-4dcd-41a4-b1a2-554681198340",
+      "name": "Sticky Note4",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// This script extracts the transcript and summary\n// from the ElevenLabs webhook payload.\n\n// The input data is assumed to be the first item in the n8n workflow.\n// The webhook node places the JSON body content directly at items[0].json.\n// Safely access the webhook data, providing a fallback if the structure is unexpected.\nconst webhookData = items[0]?.json?.body?.data;\n\n// Initialize variables to handle cases where data might be missing\nlet summary = '';\nlet fullTranscript = '';\n\n// Check if webhookData exists before proceeding\nif (webhookData) {\n  // Safely extract the summary if the 'analysis' object exists\n  if (webhookData.analysis && webhookData.analysis.transcript_summary) {\n    summary = webhookData.analysis.transcript_summary;\n  }\n\n  // Safely build the full transcript string if the 'transcript' array exists\n  if (webhookData.transcript && Array.isArray(webhookData.transcript)) {\n    webhookData.transcript.forEach(turn => {\n      // Format each message with the speaker's role (e.g., 'Agent:', 'User:')\n      if (turn.message) {\n        const role = turn.role.charAt(0).toUpperCase() + turn.role.slice(1);\n        fullTranscript += `${role}: ${turn.message}\\n`;\n      }\n    });\n  }\n}\n\n// Return a new JSON object with the extracted data\n// This new object can be used in the following nodes of your workflow\nreturn {\n  json: {\n    summary: summary,\n    fullTranscript: fullTranscript\n  }\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1120,
+        640
+      ],
+      "id": "133b728f-a717-43cb-853f-d6d2bf52795b",
+      "name": "Code2"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1Axo2OvZNX4w94yAidz3WBGJg3j3wlPeV4vkG4w_bCx4",
+          "mode": "list",
+          "cachedResultName": "Inbound Calls",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Axo2OvZNX4w94yAidz3WBGJg3j3wlPeV4vkG4w_bCx4/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Axo2OvZNX4w94yAidz3WBGJg3j3wlPeV4vkG4w_bCx4/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "summary": "={{ $json.summary }}",
+            "from number": "={{ $('Inbound Call Webhook').item.json.body.data.metadata.phone_call.external_number }}",
+            "to number": "={{ $('Inbound Call Webhook').item.json.body.data.metadata.phone_call.agent_number }}",
+            "direction": "={{ $('Inbound Call Webhook').item.json.body.data.metadata.phone_call.direction }}",
+            "time spam": "=",
+            "transcript": "={{ $json.fullTranscript }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "time spam",
+              "displayName": "time spam",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "direction",
+              "displayName": "direction",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "to number",
+              "displayName": "to number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "from number",
+              "displayName": "from number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "transcript",
+              "displayName": "transcript",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "summary",
+              "displayName": "summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -368,
+        496
+      ],
+      "id": "b601d1e7-1c2a-46a5-b565-fef1d13fe659",
+      "name": "Append or update row in sheet1"
+    },
+    {
+      "parameters": {
+        "from": "+16812026276",
+        "to": "+18777804236",
+        "message": "=Hi! 👋 You can easily book a time that works for you using this link: https://api.leadconnectorhq.com/widget/booking/W8QcIllkRPKyS76yvPEZ  \n\nLooking forward to connecting with you!",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "13c470e1-0472-4d3f-b8c0-364fff7436a9",
+      "name": "Send an SMS/MMS/WhatsApp message3"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=\nThis is actual transcript day 0:{{ $json['Transcript Day 0'] }}.\n\nThis is summary 0:{{ $json['Summary Day 0'] }}\nNow time: {{ $now }}\n\n",
+        "messages": {
+          "messageValues": [
+            {
+              "message": "SYSTEM PROMPT:\n\nYOU ARE AN EXPERT AI CALL CLASSIFICATION AGENT TRAINED TO ANALYZE OUTBOUND CALL TRANSCRIPTS AND ROUTE THEM INTO FIVE SPECIFIC CATEGORIES FOR n8n.\n\n### INSTRUCTIONS ###\n- Carefully read the call transcript.\n- The **current time** is provided as `now_time` in ISO format (e.g., 2025-08-28T14:46:39.173+03:00). Use this as the reference for all future reminders.\n- Classify each transcript into **exactly one** of these categories:\n  1. REMINDER\n  2. LEAD-OUT (opt-out)\n  3. BOOKED\n  4. WRONG PERSON\n\n---\n\n### CATEGORIES AND RULES ###\n\n1. **REMINDER**\n- Triggered when the client requests a future follow-up.\n- Examples: \"remind me later\", \"call me tomorrow morning\", \"call me in the afternoon\", \"send me an email reminder\", \"text me a reminder\".\n- Rules:\n  - Always return `\"classification\": \"reminder\"`.\n  - Include `\"reminder_type\"` as `\"call\"`, `\"sms\"`, or `\"email\"`:\n    - `\"call\"` → user says \"call me back\" or \"call me again\"\n    - `\"sms\"` → user says \"text me\" or \"send me an sms\"\n    - `\"email\"` → user says \"email me\"\n    - Default to `\"sms\"` if not specified\n  - Include `\"time\"` as an **ISO datetime in the future**, using the provided `now_time` as reference:\n    - \"remind me in 5 hours\" → `{{ $now.plus({ hours: 5 }).toISO() }}`\n    - \"remind me tomorrow morning\" → `{{ $now.plus({ days: 1 }).set({ hour: 9, minute: 0, second: 0 }).toISO() }}`\n    - \"call me this afternoon\" → pick the **next future afternoon hour** relative to `now_time`, e.g., `{{ $now.set({ hour: 15, minute: 0, second: 0 }).toISO() }}`\n  - If no time is specified, return `\"time\": null`.\n\n2. **LEAD-OUT**\n- Triggered when the client explicitly does NOT want further contact.\n- Keywords: \"stop\", \"don’t call me again\", \"remove me from your list\", \"unsubscribe\", \"never call again\", \"not interested\".\n- Output: `\"classification\": \"lead-out\"`, `\"booking_type\": null`, `\"time\": null`, `\"reminder_type\": null`.\n\n3. **NOT-PICKED**\n- Triggered if the call was not answered, when the transcript is null, went to voicemail, or user is unavailable.\n- Keywords: \"no answer\", \"not available\", \"didn’t pick\", \"busy tone\", \"left a voicemail\".\n- Output: `\"classification\": \"not-picked\"`, `\"booking_type\": null`, `\"time\": null`, `\"reminder_type\": null`.\n\n4. **WRONG-PERSON**\n- Triggered when someone other than the intended client answers the call.\n- Examples: \"This is not Bilal\", \"You have the wrong number\", \"Bilal doesn’t use this number anymore\".\n- Output: \"classification\": \"wrong-person\", \"time\": null, \"reminder\\_type\": null, \"booking\\_type\": null.**WRONG-PERSON**\n- Triggered when someone other than the intended client answers the call.\n- Examples: \"This is not Bilal\", \"You have the wrong number\", \"Bilal doesn’t use this number anymore\".\n- Output: \"classification\": \"wrong-person\", \"time\": null, \"reminder\\_type\": null, \"booking\\_type\": null.**WRONG-PERSON**\n- Triggered when someone other than the intended client answers the call.\n- Examples: \"This is not Bilal\", \"You have the wrong number\", \"Bilal doesn’t use this number anymore\".\n- Output: \"classification\": \"wrong-person\", \"time\": null, \"reminder\\_type\": null, \"booking\\_type\": null.**WRONG-PERSON**\n- Triggered when someone other than the intended client answers the call.\n- Examples: \"This is not Bilal\", \"You have the wrong number\", \"Bilal doesn’t use this number anymore\".\n- Output: \"classification\": \"wrong-person\", \"time\": null, \"reminder\\_type\": null, \"booking\\_type\": null.**WRONG-PERSON**\n- Triggered when someone other than the intended client answers the call.\n- Examples: \"This is not Bilal\", \"You have the wrong number\", \"Bilal doesn’t use this number anymore\".\n- Output: \"classification\": \"wrong-person\", \"time\": null, \"reminder\\_type\": null, \"booking\\_type\": null.**WRONG-PERSON**\n- Triggered when someone other than the intended client answers the call.\n- Examples: \"This is not Bilal\", \"You have the wrong number\", \"Bilal doesn’t use this number anymore\".\n- Output: \"classification\": \"wrong-person\", \"time\": null, \"reminder\\_type\": null, \"booking\\_type\": null.**WRONG-PERSON**\n- Triggered when someone other than the intended client answers the call.\n- Examples: \"This is not Bilal\", \"You have the wrong number\", \"Bilal doesn’t use this number anymore\".\n- Output: \"classification\": \"wrong-person\", \"time\": null, \"reminder\\_type\": null, \"booking\\_type\": null.**WRONG-PERSON**\n- Triggered when someone other than the intended client answers the call.\n- Examples: \"This is not Bilal\", \"You have the wrong number\", \"Bilal doesn’t use this number anymore\".\n- Output: \"classification\": \"wrong-person\", \"time\": null, \"reminder\\_type\": null, \"booking\\_type\": null.**WRONG-PERSON**\n- Triggered when someone other than the intended client answers the call.\n- Examples: \"This is not Bilal\", \"You have the wrong number\", \"Bilal doesn’t use this number anymore\".\n- Output: \"classification\": \"wrong-person\", \"time\": null, \"reminder\\_type\": null, \"booking\\_type\": null.**WRONG-PERSON**\n- Triggered when someone other than the intended client answers the call.\n- Examples: \"This is not Bilal\", \"You have the wrong number\", \"Bilal doesn’t use this number anymore\".\n- Output: \"classification\": \"wrong-person\", \"time\": null, \"reminder\\_type\": null, \"booking\\_type\": null.\n---\n\n### EDGE CASES ###\n- If the user says both \"remind me\" and \"don't call me again\", **prioritize LEAD-OUT**.\n- If the user agrees to a meeting, **prioritize BOOKED**.\n\n---\n\n### OUTPUT FORMAT ###\nAlways return exactly this JSON structure (valid JSON, no comments):\n\n{\n  \"classification\": \"reminder | lead-out | not-picked | booked\",\n  \"time\": \"ISO datetime format if reminder includes a time, else null\",\n  \"reminder_type\": \"call | sms | email, else null\"\n  \"booking_type\": \"sms | email, else null,\n}\n\n**Notes:**\n- `\"time\"` must be **null** if not a reminder or if no time specified.\n- `\"reminder_type\"` must be **null** if not a reminder.\n- Do not include extra text, explanations, or formatting outside the JSON.\n- Use the provided `now_time` as the reference for all dynamic time calculations.\n- Here’s a recommended table in 12-hour format (LA time):\n\nPart of Day\tStarts At\tEnds At\tNotes\nMidnight\t12:00 AM\t12:59 AM\tNot suitable for clinic reminders\nEarly Morning\t6:00 AM\t7:59 AM\tBefore business hours; some early risers\nMorning\t8:00 AM\t11:59 AM\tClinic opening hours; ideal for reminders\nNoon\t12:00 PM\t12:59 PM\tMidday break; okay for reminders\nAfternoon\t1:00 PM\t4:59 PM\tActive clinic hours; good for reminders\nEvening\t5:00 PM\t7:00 PM\tClosing hours; okay for last call reminders\nNight\t7:01 PM\t11:59 PM\tNot ideal; outside typical business hours\n\nNotes / Adjustments for MedSpas & Clinics:\n\nAvoid reminders during very early morning (1–5:59 AM) or late night (after 7 PM).\n\nDefault morning reminders → 9:00 AM\n\nDefault afternoon reminders → 2:00 PM\n\nDefault evening reminders → 6:00 PM\n---\n\n### EXAMPLES ###\n\n**Example 1:**  \nTranscript: \"Can you call me tomorrow morning at 9am?\"  \nNow_time: \"2025-08-28T14:46:39.173+03:00\"  \nOutput:  \n{\n  \"classification\": \"reminder\",\n  \"time\": \"{{ $now.plus({ days: 1 }).set({ hour: 9, minute: 0, second: 0 }).toISO() }}\",\n  \"reminder_type\": \"call\"\n}\n\n**Example 2:**  \nTranscript: \"Please don’t contact me again via SMS.\"  \nNow_time: \"2025-08-28T14:46:39.173+03:00\"  \nOutput:  \n{\n  \"classification\": \"lead-out\",\n  \"booking_type\": null,\n  \"time\": null,\n  \"reminder_type\": null\n}\n\n**Example 3:**  \nTranscript: \"The number you have dialed is not available.\"  \nNow_time: \"2025-08-28T14:46:39.173+03:00\"  \nOutput:  \n{\n  \"classification\": \"not-picked\",\n  \"booking_type\": null,\n  \"time\": null,\n  \"reminder_type\": null\n}\n\n\n**Example 5:**  \nTranscript: \"That sounds good, I'll take that meeting, send booking link via email\"  \nNow_time: \"2025-08-28T14:46:39.173+03:00\"  \nOutput:  \n{\n  \"classification\": \"booked\",\n  \"booking_type\": email,\n  \"time\": null,\n  \"reminder_type\": null\n}\n\n**Example 6:**  \nTranscript: \"Can you send me an email reminder next week?\"  \nNow_time: \"2025-08-28T14:46:39.173+03:00\"  \nOutput:  \n{\n  \"classification\": \"reminder\",\n  \"booking_type\": null,\n  \"time\": \"{{ $now.plus({ days: 7 }).toISO() }}\",\n  \"reminder_type\": \"email\"\n}\n"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        64,
+        416
+      ],
+      "id": "bb46f81b-e7f8-46da-bec7-b961f57349b8",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-4o-mini",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        48,
+        624
+      ],
+      "id": "4f140a36-2bd8-4eb9-a346-e98596ef9f53",
+      "name": "OpenRouter Chat Model"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        1056,
+        384
+      ],
+      "id": "f2db5d26-8891-4ebf-80a8-be791dc3a908",
+      "name": "Delete a contact"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "69a956dc-77a2-4cc4-8127-a5420ab4331f",
+                    "leftValue": "={{ $json.classification }}",
+                    "rightValue": "lead-out",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "lead-out"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "b13a6c6c-f0fe-41c8-8ddf-df03b1a6f44f",
+                    "leftValue": "={{ $json.classification }}",
+                    "rightValue": "wrong-person",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "wrong-person"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "817d783e-7227-415d-b1cb-6282f2a92467",
+                    "leftValue": "={{ $json.classification }}",
+                    "rightValue": "booked",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "booked"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        656,
+        400
+      ],
+      "id": "517e88d8-615f-4d7e-b944-c33cb5239356",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "jsCode": "let aiText = null;\n\n// Try multiple possible locations for AI output\nif (items[0].json.response?.generations?.[0]?.[0]?.text) {\n    aiText = items[0].json.response.generations[0][0].text;\n} else if (items[0].json.text) {\n    aiText = items[0].json.text;\n} else {\n    throw new Error(\"AI output not found\");\n}\n\n// Remove any ```json or ``` markdown\naiText = aiText.replace(/```json\\s*/g, '').replace(/```/g, '').trim();\n\n// Try parsing JSON\nlet parsed = null;\ntry {\n    parsed = JSON.parse(aiText);\n} catch (err) {\n    throw new Error(\"Failed to parse AI JSON output\");\n}\n\n// If the AI returned the object under \"output\", use that; otherwise fallback\nconst output = parsed.output ?? parsed;\n\n// Ensure all required fields exist\nconst classification = output.classification ?? null;\nconst time = output.time ?? null;\nconst reminder_type = output.reminder_type ?? null;\nconst booking_type = output.booking_type ?? null; // <-- added field\n\n// Return properly formatted n8n object\nreturn [\n    {\n        json: {\n            classification,\n            time,\n            reminder_type,\n            booking_type // <-- included in output\n        }\n    }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        416
+      ],
+      "id": "701c1323-c911-4a2e-9615-4df0eb31eda4",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "subject": "=Client Removal Update – {{clientName}} (Yellow Rock House)",
+        "emailType": "text",
+        "message": "=Hi Team,  \n\nDuring our recent outbound call, {{clientName}} requested to be removed from further communication. As per their request, we have now removed them from our contact list.  \n\nPlease ensure that:  \n - No further calls or follow-ups are made to this client.  \n - All records in CRM/n8n are updated accordingly.  \n - Any scheduled reminders or campaigns related to this client are canceled.  \n\nThanks for keeping everything up to date and respecting client preferences.  \n\nBest regards, \nYellow Rock House Team",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1296,
+        384
+      ],
+      "id": "71df1bcf-2839-41f2-bf73-97ed31de17e2",
+      "name": "Send a message",
+      "webhookId": "55b50f56-8e90-4d7b-acef-9dd4f6ce08f7"
+    },
+    {
+      "parameters": {
+        "subject": "=New Lead Ready to Book – {{leadName}}",
+        "emailType": "text",
+        "message": "=Hi Team,\n\nWe have a new lead who has agreed on the call to book an appointment with Yellow Rock House.\n\nLead Name: {{leadName}}\nBooking Link: {{bookingLink}}\n\nPlease make sure to follow up and assist them promptly.\n\nThanks for your attention!\n\nBest regards,\nYellow Rock House Team",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1040,
+        624
+      ],
+      "id": "83f99a4a-af63-428d-875c-99ae482de01d",
+      "name": "Notifying Team",
+      "webhookId": "6385279f-f8d4-4a19-a7d7-c040936992c4"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "191W_RrLTYDOM8bgXodL5hpyiusJ7vlTHPOVYFKzEOOk",
+          "mode": "list",
+          "cachedResultName": "Data Base of lead",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/191W_RrLTYDOM8bgXodL5hpyiusJ7vlTHPOVYFKzEOOk/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1807673988,
+          "mode": "list",
+          "cachedResultName": "Outbound Calls",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/191W_RrLTYDOM8bgXodL5hpyiusJ7vlTHPOVYFKzEOOk/edit#gid=1807673988"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "To Number",
+              "lookupValue": "={{ $('Get a contact3').item.json.phone }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -112,
+        416
+      ],
+      "id": "37b76f2c-d0fc-4cc6-80df-a41e2d0ae22f",
+      "name": "Get Summary of inbound transcript"
+    },
+    {
+      "parameters": {
+        "message": "=Hi {{leadName}}, thanks for booking with Yellow Rock House!\n\nPlease confirm your appointment here: {{bookingLink}}  \n\nWe look forward to seeing you.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        1392,
+        1024
+      ],
+      "id": "748c1e23-c215-4200-9af6-6269b17c99a0",
+      "name": "Thanks for booking sms"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "2f9ccb6d-d137-48eb-8e64-10511fa5ec12",
+              "leftValue": "={{ $json.booking_type }}",
+              "rightValue": "sms",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1088,
+        1056
+      ],
+      "id": "c2560189-4181-4ffc-80b8-f7c6528f7aa4",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "subject": "=Booking link as promised – Yellow Rock House",
+        "emailType": "text",
+        "message": "=Hi {{leadName}},  \n\nThank you for agreeing to book your appointment with Yellow Rock House. \nYou can confirm your slot anytime using the link below:  👉 Book Your Appointment Here  \n\nWe appreciate your time and look forward to seeing you soon!  \n\nBest regards, \nYellow Rock House Team",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1408,
+        1216
+      ],
+      "id": "c57f4690-e442-4ccb-b566-82375f5f8c36",
+      "name": "Send a message3",
+      "webhookId": "abda3e9f-8b31-419a-9e49-84b4796d630c"
+    },
+    {
+      "parameters": {
+        "subject": "=New Lead Ready to Book – {{leadName}}",
+        "emailType": "text",
+        "message": "=Hi Team,\n\nWe have a new lead who has agreed on the call to book an appointment with Yellow Rock House.\n\nLead Name: {{leadName}}\nBooking Link: {{bookingLink}}\n\nPlease make sure to follow up and assist them promptly.\n\nThanks for your attention!\n\nBest regards,\nYellow Rock House Team",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1760,
+        1136
+      ],
+      "id": "ad64f268-914a-4fd3-8b10-a1fee0aea514",
+      "name": "Notifying Team1",
+      "webhookId": "6385279f-f8d4-4a19-a7d7-c040936992c4"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "filters": {
+          "query": "={{ $json.body.data.metadata.phone_call.external_number }}"
+        },
+        "options": {},
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        -1328,
+        432
+      ],
+      "id": "f98e6dd7-435d-496b-ae0d-378e1c24bf22",
+      "name": "Get many contacts"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "contactId": "={{ $json.id }}",
+        "updateFields": {
+          "tags": "={{ \n  (() => {\n    const tags = $json.tags || [];\n    \n    // Match only voicemail tags with 2 numbers (ignore single-number ones like voicemail_day_0)\n    const voicemailTags = tags.filter(t => /^voicemail_day_\\d+_\\d+_*$/.test(t));\n    \n    if (voicemailTags.length === 0) {\n      return tags.filter(t => !t.startsWith('voicemail_day_'));\n    }\n    \n    // Parse numbers (X and Y) even if trailing underscores exist\n    const maxTag = voicemailTags\n      .map(t => {\n        const match = t.match(/^voicemail_day_(\\d+)_(\\d+)_*$/);\n        return { day: parseInt(match[1]), part: parseInt(match[2]) };\n      })\n      .sort((a, b) => a.day - b.day || a.part - b.part)\n      .pop();\n    \n    return tags\n      .filter(t => !t.startsWith('voicemail_day_'))\n      .concat([`voicemail_day_${maxTag.day}_${maxTag.part}_answered`]);\n  })() \n}}\n"
+        },
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-base.highLevel",
+      "typeVersion": 2,
+      "position": [
+        -1120,
+        432
+      ],
+      "id": "ec266c6d-173e-4446-b92b-40597f0b7a82",
+      "name": "Update a contact"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -768,
+        528
+      ],
+      "id": "c058d1d5-1cb4-46b1-b50d-4339d89e4910",
+      "name": "Merge"
+    }
+  ],
+  "connections": {
+    "Inbound Call Webhook": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get many contacts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Append or update row in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Get Summary of inbound transcript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send an SMS/MMS/WhatsApp message3": {
+      "main": [
+        [
+          {
+            "node": "Callback Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete a contact": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Delete a contact",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Notifying Team",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Summary of inbound transcript": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Thanks for booking sms": {
+      "main": [
+        [
+          {
+            "node": "Notifying Team1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Thanks for booking sms",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message3": {
+      "main": [
+        [
+          {
+            "node": "Notifying Team1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many contacts": {
+      "main": [
+        [
+          {
+            "node": "Update a contact",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a contact": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {
+    "Inbound Call Webhook": [
+      {
+        "headers": {
+          "host": "billu2323.app.n8n.cloud",
+          "user-agent": "ElevenLabs/1.0",
+          "content-length": "5769",
+          "accept": "*/*",
+          "accept-encoding": "gzip, br",
+          "cdn-loop": "cloudflare; loops=1; subreqs=1",
+          "cf-connecting-ip": "34.59.11.47",
+          "cf-ew-via": "15",
+          "cf-ipcountry": "US",
+          "cf-ray": "9735a80d41c3b3b7-MAN",
+          "cf-visitor": "{\"scheme\":\"https\"}",
+          "cf-worker": "n8n.cloud",
+          "content-type": "application/json",
+          "elevenlabs-signature": "t=1755900166,v0=d8c4b44e10aeb80d0a912d0a149a21eb773b6837fc89ce0bf78bf91b104e9b23",
+          "x-forwarded-for": "34.59.11.47, 172.70.58.59",
+          "x-forwarded-host": "billu2323.app.n8n.cloud",
+          "x-forwarded-port": "443",
+          "x-forwarded-proto": "https",
+          "x-forwarded-server": "traefik-prod-users-gwc-2-ddc688d69-6987q",
+          "x-is-trusted": "yes",
+          "x-real-ip": "34.59.11.47"
+        },
+        "params": {},
+        "query": {},
+        "body": {
+          "type": "post_call_transcription",
+          "event_timestamp": 1755900166,
+          "data": {
+            "agent_id": "agent_3601k39vs7xpe9fa3q4ehkss8kve",
+            "conversation_id": "conv_4501k39ww1t7fp4rahc3ygg2nmhk",
+            "status": "done",
+            "user_id": null,
+            "transcript": [
+              {
+                "role": "agent",
+                "message": "Hi, this is Aleyna from Banana AI, how can i help you today?",
+                "tool_calls": [],
+                "tool_results": [],
+                "feedback": null,
+                "llm_override": null,
+                "time_in_call_secs": 0,
+                "conversation_turn_metrics": {
+                  "metrics": {
+                    "convai_tts_service_ttfb": {
+                      "elapsed_time": 0.21332690000053844
+                    }
+                  }
+                },
+                "rag_retrieval_info": null,
+                "llm_usage": null,
+                "interrupted": false,
+                "original_message": null,
+                "source_medium": null
+              },
+              {
+                "role": "user",
+                "message": "You also. Hi, Alina. I just want to book an appointment.",
+                "tool_calls": [],
+                "tool_results": [],
+                "feedback": null,
+                "llm_override": null,
+                "time_in_call_secs": 4,
+                "conversation_turn_metrics": {
+                  "metrics": {
+                    "convai_asr_trailing_service_latency": {
+                      "elapsed_time": 0.11292554100054986
+                    }
+                  }
+                },
+                "rag_retrieval_info": null,
+                "llm_usage": null,
+                "interrupted": false,
+                "original_message": null,
+                "source_medium": "audio"
+              },
+              {
+                "role": "agent",
+                "message": "Perfect! I can definitely help you with that. To book an appointment, could you please confirm if you...",
+                "tool_calls": [],
+                "tool_results": [],
+                "feedback": null,
+                "llm_override": null,
+                "time_in_call_secs": 8,
+                "conversation_turn_metrics": {
+                  "metrics": {
+                    "convai_llm_service_ttf_sentence": {
+                      "elapsed_time": 0.5306844450005883
+                    },
+                    "convai_llm_service_ttfb": {
+                      "elapsed_time": 0.2588123710002037
+                    },
+                    "convai_llm_service_tt_last_sentence": {
+                      "elapsed_time": 0.6706929440006206
+                    },
+                    "convai_tts_service_ttfb": {
+                      "elapsed_time": 0.17339613200056192
+                    }
+                  }
+                },
+                "rag_retrieval_info": null,
+                "llm_usage": {
+                  "model_usage": {
+                    "gemini-2.0-flash-001": {
+                      "input": {
+                        "tokens": 2014,
+                        "price": 0.00020140000000000002
+                      },
+                      "input_cache_read": {
+                        "tokens": 0,
+                        "price": 0
+                      },
+                      "input_cache_write": {
+                        "tokens": 0,
+                        "price": 0
+                      },
+                      "output_total": {
+                        "tokens": 29,
+                        "price": 0.0000116
+                      }
+                    }
+                  }
+                },
+                "interrupted": true,
+                "original_message": "Perfect! I can definitely help you with that. To book an appointment, could you please confirm if you are a new or existing client?\n",
+                "source_medium": null
+              }
+            ],
+            "metadata": {
+              "start_time_unix_secs": 1755900151,
+              "accepted_time_unix_secs": 1755900152,
+              "call_duration_secs": 13,
+              "cost": 148,
+              "deletion_settings": {
+                "deletion_time_unix_secs": null,
+                "deleted_logs_at_time_unix_secs": null,
+                "deleted_audio_at_time_unix_secs": null,
+                "deleted_transcript_at_time_unix_secs": null,
+                "delete_transcript_and_pii": false,
+                "delete_audio": false
+              },
+              "feedback": {
+                "overall_score": null,
+                "likes": 0,
+                "dislikes": 0
+              },
+              "authorization_method": "signed_url",
+              "charging": {
+                "dev_discount": false,
+                "is_burst": false,
+                "tier": "free",
+                "llm_usage": {
+                  "irreversible_generation": {
+                    "model_usage": {
+                      "gemini-2.0-flash-001": {
+                        "input": {
+                          "tokens": 2014,
+                          "price": 0.00020140000000000002
+                        },
+                        "input_cache_read": {
+                          "tokens": 0,
+                          "price": 0
+                        },
+                        "input_cache_write": {
+                          "tokens": 0,
+                          "price": 0
+                        },
+                        "output_total": {
+                          "tokens": 29,
+                          "price": 0.0000116
+                        }
+                      }
+                    }
+                  },
+                  "initiated_generation": {
+                    "model_usage": {
+                      "gemini-2.0-flash-001": {
+                        "input": {
+                          "tokens": 2014,
+                          "price": 0.00020140000000000002
+                        },
+                        "input_cache_read": {
+                          "tokens": 0,
+                          "price": 0
+                        },
+                        "input_cache_write": {
+                          "tokens": 0,
+                          "price": 0
+                        },
+                        "output_total": {
+                          "tokens": 29,
+                          "price": 0.0000116
+                        }
+                      }
+                    }
+                  }
+                },
+                "llm_price": 0.00021300000000000003,
+                "llm_charge": 2,
+                "call_charge": 146
+              },
+              "phone_call": {
+                "direction": "inbound",
+                "phone_number_id": "phnum_3701k39wsmeef54t2r60m9j9eev0",
+                "agent_number": "+13135130534",
+                "external_number": "+966576908563",
+                "type": "twilio",
+                "stream_sid": "MZ4da7dde01908e97b68d207e6e451e278",
+                "call_sid": "CAac98323431342208c8dc6364ae84100a"
+              },
+              "batch_call": null,
+              "termination_reason": "Call ended by remote party",
+              "error": null,
+              "main_language": "en",
+              "rag_usage": null,
+              "text_only": false,
+              "features_usage": {
+                "language_detection": {
+                  "enabled": false,
+                  "used": false
+                },
+                "transfer_to_agent": {
+                  "enabled": false,
+                  "used": false
+                },
+                "transfer_to_number": {
+                  "enabled": false,
+                  "used": false
+                },
+                "multivoice": {
+                  "enabled": false,
+                  "used": false
+                },
+                "dtmf_tones": {
+                  "enabled": false,
+                  "used": false
+                },
+                "external_mcp_servers": {
+                  "enabled": false,
+                  "used": false
+                },
+                "pii_zrm_workspace": false,
+                "pii_zrm_agent": false,
+                "tool_dynamic_variable_updates": {
+                  "enabled": false,
+                  "used": false
+                },
+                "is_livekit": false,
+                "voicemail_detection": {
+                  "enabled": false,
+                  "used": false
+                },
+                "workflow": {
+                  "enabled": false,
+                  "tool_node": {
+                    "enabled": false,
+                    "used": false
+                  }
+                },
+                "agent_testing": {
+                  "enabled": false,
+                  "tests_ran_after_last_modification": false,
+                  "tests_ran_in_last_7_days": false
+                }
+              },
+              "eleven_assistant": {
+                "is_eleven_assistant": false
+              },
+              "initiator_id": null,
+              "conversation_initiation_source": "twilio",
+              "conversation_initiation_source_version": null,
+              "timezone": null
+            },
+            "analysis": {
+              "evaluation_criteria_results": {},
+              "data_collection_results": {},
+              "call_successful": "success",
+              "transcript_summary": "Aleyna from Banana AI offered to help a user book an appointment. The user confirmed their request. Aleyna then asked for confirmation to proceed.\n",
+              "call_summary_title": "Book an appointment"
+            },
+            "conversation_initiation_client_data": {
+              "conversation_config_override": {
+                "tts": null,
+                "conversation": null,
+                "agent": null
+              },
+              "custom_llm_extra_body": {},
+              "user_id": null,
+              "source_info": {
+                "source": null,
+                "version": null
+              },
+              "dynamic_variables": {
+                "system__agent_id": "agent_3601k39vs7xpe9fa3q4ehkss8kve",
+                "system__current_agent_id": "agent_3601k39vs7xpe9fa3q4ehkss8kve",
+                "system__conversation_id": "conv_4501k39ww1t7fp4rahc3ygg2nmhk",
+                "system__caller_id": "+966576908563",
+                "system__called_number": "+13135130534",
+                "system__call_duration_secs": 13,
+                "system__time_utc": "2025-08-22T22:02:44.960015+00:00",
+                "system__time": "Friday, 22:02 22 August 2025",
+                "system__timezone": null,
+                "system__call_sid": "CAac98323431342208c8dc6364ae84100a"
+              }
+            }
+          }
+        },
+        "webhookUrl": "https://billu2323.app.n8n.cloud/webhook-test/inbound-call",
+        "executionMode": "test"
+      }
+    ]
+  },
+  "meta": {
+    "instanceId": "1a6100b2e52ae3c290d86af3a0507cd2e67a0cc99a26544ed00345df21ae1dd0"
+  }
+}
